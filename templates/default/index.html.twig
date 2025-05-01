@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container gallery-container">
+    <div class="gallery-header text-center mb-5">
+        <h2 class="display-4 fw-bold gallery-title">Notre Collection de Photos</h2>
+        <p class="lead">Découvrez notre magnifique galerie d'images</p>
+        <div class="sparkle-divider my-4"><span>✨</span></div>
+    </div>
+
+    <div class="photos masonry-grid">
+        {% for photo in photos %}
+            <div class="masonry-item" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+                <a href="{{ photo.detailUrl }}" class="photo-card" target="_blank">
+                    <div class="photo-frame">
+                        <img src="{{ photo.imageUrl }}" alt="" loading="lazy" class="img-fluid">
+                        <div class="photo-overlay">
+                            <div class="overlay-content">
+                                <span class="view-icon">👁️</span>
+                                <span class="view-text">Voir plus</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="gallery-footer text-center mt-5">
+        <button class="btn btn-outline-light btn-lg pulse-btn">Charger plus d'images</button>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animation au défilement
+        const items = document.querySelectorAll('.masonry-item');
+
+        const animateOnScroll = () => {
+            items.forEach(item => {
+                const itemPosition = item.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight;
+
+                if (itemPosition < screenPosition) {
+                    item.classList.add('visible');
+                }
+            });
+        };
+
+        // Initial check
+        animateOnScroll();
+
+        // On scroll
+        window.addEventListener('scroll', animateOnScroll);
+
+        // Animation du bouton
+        document.querySelector('.pulse-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            this.classList.add('clicked');
+            setTimeout(() => {
+                this.classList.remove('clicked');
+            }, 500);
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

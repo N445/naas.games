@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Naas Games{% endblock %}</title>
+
+
+    <link rel="icon" type="image/png" href="{{ asset('favicon/favicon-96x96.png') }}" sizes="96x96"/>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon/favicon.svg') }}"/>
+    <link rel="shortcut icon" href="{{ asset('favicon/favicon.ico') }}"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('favicon/apple-touch-icon.png') }}"/>
+    <meta name="apple-mobile-web-app-title" content="MyWebSite"/>
+    <link rel="manifest" href="{{ asset('favicon/site.webmanifest') }}"/>
+
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+
+    {% block javascripts %}
+        {{ encore_entry_script_tags('app') }}
+    {% endblock %}
+</head>
+<body>
+<div class="text-center mt-5">
+    <img src="{{ 'images/naas-logo.png'|imagine_filter('main_logo') }}" alt="Naas Logo" width="250" class="rounded-circle">
+    <h1>Official Naas Website</h1>
+</div>
+{% block body %}{% endblock %}
+</body>
+</html>
