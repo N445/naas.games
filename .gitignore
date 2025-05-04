@@ -21,3 +21,5 @@ yarn-error.log
 /public/media/cache/
 !/public/media/.gitkeep
 ###< liip/imagine-bundle ###
+
+.idea
