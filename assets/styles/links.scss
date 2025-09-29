@@ -1,0 +1,56 @@
+body {
+  .links-container {
+    width: 100%;
+    position: relative;
+    z-index: 10;
+
+    background-image: url("./../../public/images/StarCitizen 2025-03-29 01-47-53.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+
+    &:after {
+      content: '';
+      position: absolute;
+      background-color: rgba(white, .2);
+      inset: 0;
+      backdrop-filter: blur(10px);
+      z-index: 5;
+    }
+
+    .header {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+
+      .naas-logo {
+        width: 200px;
+        border-radius: 800px;
+      }
+    }
+
+    .links {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+
+      .link {
+        margin-top: 5px;
+        margin-bottom: 5px;
+        padding: 25px 50px;
+        background-color: rgba(black, .5);
+        border: 1px solid rgba(black, 0.8);
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 25px;
+        color: white;
+        transition: 0.3s;
+
+        &:hover {
+          background-color: rgba(black, 0.8);
+        }
+      }
+    }
+  }
+}

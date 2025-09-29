@@ -19,8 +19,8 @@
         "build": "encore production --progress"
     },
     "dependencies": {
-        "@fortawesome/fontawesome-free": "^6.7.2",
+        "@fortawesome/fontawesome-free": "^7.0.1",
         "@popperjs/core": "^2.11.8",
-        "bootstrap": "^5.3.5"
+        "bootstrap": "^5.3.8"
     }
 }

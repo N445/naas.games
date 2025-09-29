@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Links {{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="links-container py-5">
+
+        <div class="container">
+            <div class="header">
+                <img src="{{ asset('naas-logo.png') }}" alt="Naas logo" class="naas-logo">
+
+                <h1>Naas</h1>
+                <p>
+                    🇫🇷 French StarCitizen player 📸 Love taking pictures ➡️ Full res on my flickr
+                </p>
+            </div>
+
+            <div class="links">
+                {% for link in links %}
+                    <a href="{{ link.url }}" class="link">{{ link.title }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('links') }}
+{% endblock %}
