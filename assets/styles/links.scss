@@ -1,30 +1,51 @@
-body {
+#link-page {
+  position: relative;
+  background-image: url("./../../public/images/StarCitizen 2025-03-29 01-47-53.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  min-height: 100vh;
+
+  &:after {
+    content: '';
+    position: absolute;
+    background-color: rgba(black, .8);
+    inset: 0;
+    backdrop-filter: blur(10px);
+    z-index: 5;
+  }
+
   .links-container {
-    width: 100%;
+    max-width: 550px;
+    min-height: 100%;
+    margin: 0 auto;
     position: relative;
     z-index: 10;
 
-    background-image: url("./../../public/images/StarCitizen 2025-03-29 01-47-53.jpg");
+    background-image: url("./../../public/naas-logo.png");
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
+    padding: 50px;
+    border-radius: 60px;
+    overflow: hidden;
 
-    &:after {
+    &:before {
       content: '';
+      background-color: rgba(black, .6);
+      backdrop-filter: blur(80px);
       position: absolute;
-      background-color: rgba(white, .2);
       inset: 0;
-      backdrop-filter: blur(10px);
-      z-index: 5;
     }
 
     .header {
       position: relative;
       z-index: 10;
       text-align: center;
+      color: white;
 
       .naas-logo {
-        width: 200px;
+        width: 150px;
         border-radius: 800px;
       }
     }
@@ -38,17 +59,19 @@ body {
       .link {
         margin-top: 5px;
         margin-bottom: 5px;
-        padding: 25px 50px;
-        background-color: rgba(black, .5);
-        border: 1px solid rgba(black, 0.8);
-        border-radius: 5px;
+        padding: .5rem 2rem;
+        background-color: rgba(black, .1);
+        border:1px solid rgba(black, .2);
+        border-radius: 8px;
         text-decoration: none;
-        font-size: 25px;
+        font-size: 16px;
         color: white;
         transition: 0.3s;
+        text-align: center;
+        backdrop-filter: blur(100px);
 
         &:hover {
-          background-color: rgba(black, 0.8);
+          background-color: rgba(black, .6);
         }
       }
     }

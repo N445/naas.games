@@ -1,0 +1,27 @@
+<div{{ attributes.defaults(stimulus_controller('links')) }}>
+    <div id="link-page" class="py-5">
+        <div class="links-container py-5">
+            <div class="header">
+                <img src="{{ asset('naas-logo.png') }}" alt="Naas logo" class="naas-logo">
+
+                <h1>Naas</h1>
+                <p>
+                    🇫🇷 French Star Citizen player 📸 Love taking pictures ➡️ Full res on my flickr
+                </p>
+            </div>
+
+            <div class="links">
+                {% for link in this.getLinks() %}
+                    <a
+                            href="{{ link.url }}"
+                            class="link"
+                            target="_blank"
+                            {{ live_action('addStats',{linkId:link.id}) }}
+                    >
+                        {{ link.title }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

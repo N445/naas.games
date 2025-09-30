@@ -30,12 +30,17 @@ class Link
     /**
      * @var Collection<int, Stats>
      */
-    #[ORM\OneToMany(targetEntity: Stats::class, mappedBy: 'link', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Stats::class, mappedBy: 'link', cascade: ['persist','remove'], orphanRemoval: true)]
     private Collection $stats;
 
     public function __construct()
     {
         $this->stats = new ArrayCollection();
+    }
+
+    public function __toString()
+    {
+        return \sprintf('%s (%s)',$this->title,$this->url);
     }
 
     public function getId(): ?int

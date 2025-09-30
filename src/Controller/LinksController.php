@@ -10,14 +10,9 @@ use Symfony\Component\Routing\Attribute\Route;
 final class LinksController extends AbstractController
 {
     #[Route('/links', name: 'app_links')]
-    public function index(LinkRepository $linkRepository): Response
+    public function index(): Response
     {
-        $links = $linkRepository->createQueryBuilder('l')
-            ->orderBy('l.display_order', 'ASC')
-            ->getQuery()
-            ->getResult();
         return $this->render('links/index.html.twig', [
-            'links' => $links,
         ]);
     }
 }

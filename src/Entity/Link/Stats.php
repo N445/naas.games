@@ -23,6 +23,11 @@ class Stats
     #[ORM\JoinColumn(nullable: false)]
     private ?Link $link = null;
 
+    public function __construct(?string $ip = null)
+    {
+        $this->ip = $ip;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
