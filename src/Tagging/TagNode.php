@@ -16,6 +16,11 @@ final class TagNode
     ) {
     }
 
+    public function displayName(): string
+    {
+        return TagName::display($this->name);
+    }
+
     public function adopt(self $child): void
     {
         $this->children[] = $child;
@@ -69,6 +74,44 @@ final class TagNode
         }
 
         return $kept->hasChildren() ? $kept : null;
+    }
+
+    /**
+     * @return list<int>
+     */
+    public function subtreeIds(): array
+    {
+        return [$this->id, ...array_merge([], ...array_map(static fn (self $child): array => $child->subtreeIds(), $this->children))];
+    }
+
+    public function find(int $tagId): ?self
+    {
+        if ($this->id === $tagId) {
+            return $this;
+        }
+
+        foreach ($this->children as $child) {
+            $found = $child->find($tagId);
+            if (null !== $found) {
+                return $found;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function labelledChoices(string $prefix): array
+    {
+        $label = $prefix.$this->displayName();
+        $choices = [$label => $this->id];
+        foreach ($this->children as $child) {
+            $choices += $child->labelledChoices($label.' › ');
+        }
+
+        return $choices;
     }
 
     /**

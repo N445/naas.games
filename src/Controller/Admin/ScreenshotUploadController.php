@@ -66,9 +66,13 @@ final class ScreenshotUploadController extends AbstractController
             return $this->json(['error' => count($violations) > 0 ? $violations->get(0)->getMessage() : 'Aucun fichier reçu.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $screenshot = $importer->import($upload, $this->findAlbum($request->request->getString('album')), $this->findGame($request->request->getString('game')));
+        $result = $importer->import($upload, $this->findAlbum($request->request->getString('album')), $this->findGame($request->request->getString('game')));
+        $template = $request->request->getBoolean('compact') ? 'admin/screenshot/_uploaded_compact.html.twig' : 'admin/screenshot/_uploaded.html.twig';
 
-        return $this->json(['html' => $this->renderView('admin/screenshot/_uploaded.html.twig', ['screenshot' => $screenshot])]);
+        return $this->json([
+            'duplicate' => $result->duplicate,
+            'html' => $this->renderView($result->duplicate ? 'admin/screenshot/_uploaded_compact.html.twig' : $template, ['screenshot' => $result->screenshot, 'duplicate' => $result->duplicate]),
+        ]);
     }
 
     private function findAlbum(string $albumId): ?Album

@@ -2,6 +2,8 @@
 
 {% block title %}Naas · Liens{% endblock %}
 
+{% block stylesheets %}{{ parent() }}{{ encore_entry_link_tags('links') }}{% endblock %}
+
 {% block body %}
     {% set background_url = background
         ? background.path|imagine_filter('screenshot_preview')

@@ -4,7 +4,7 @@
             Contenu de l'album <small class="text-muted">· {{ album.countScreenshots }} images</small>
         </h2>
         <div class="screenshot-grid">
-            {% for screenshot in album.screenshots %}
+            {% for screenshot in computed.screenshots %}
                 <figure class="screenshot-card {{ album.hasCover(screenshot) ? 'screenshot-card--cover' }}" data-loading="addClass(is-loading)">
                     <img src="{{ screenshot.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy">
                     {% if album.hasCover(screenshot) %}<span class="screenshot-card__badge"><i class="fa fa-star"></i> Couverture</span>{% endif %}
@@ -17,12 +17,22 @@
                         <a class="btn btn-sm btn-light" title="Modifier" href="{{ path('APP_ADMIN_screenshot_edit', {entityId: screenshot.id}) }}"><i class="fa fa-pen"></i></a>
                         <button type="button" class="btn btn-sm btn-light" title="Retirer de l'album"
                                 data-action="live#action" data-live-action-param="remove" data-live-screenshot-id-param="{{ screenshot.id }}"><i class="fa fa-xmark"></i></button>
+                        <button type="button" class="btn btn-sm btn-danger" title="Supprimer définitivement"
+                                data-controller="confirm" data-confirm-message-value="Supprimer définitivement « {{ screenshot.title }} » et son fichier ?"
+                                data-action="confirm#ask live#action" data-live-action-param="delete" data-live-screenshot-id-param="{{ screenshot.id }}"><i class="fa fa-trash"></i></button>
                     </div>
                 </figure>
             {% else %}
                 <p class="text-muted">Cet album est vide. Importez des screenshots ou ajoutez-en depuis la photothèque ci-dessous.</p>
             {% endfor %}
         </div>
+        {% if computed.remaining > 0 %}
+            <div class="text-center mt-3">
+                <button type="button" class="btn btn-secondary" data-action="live#action" data-live-action-param="showMore" data-loading="addAttribute(disabled)">
+                    Afficher plus <small class="text-muted">· encore {{ computed.remaining }}</small>
+                </button>
+            </div>
+        {% endif %}
     </section>
 
     <section class="dashboard-panel">

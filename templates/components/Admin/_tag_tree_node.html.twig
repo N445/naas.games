@@ -17,7 +17,7 @@
             {{ include('components/Admin/_tag_tree_input.html.twig', {placeholder: 'Nouveau nom'}) }}
         {% else %}
             <span class="tag-node__name {{ query and node.matches(query) ? 'is-match' }}" title="Double-cliquez pour renommer"
-                  data-action="dblclick->live#action" data-live-action-param="startEdit" data-live-tag-id-param="{{ node.id }}" data-live-name-param="{{ node.name }}">{{ node.name }}</span>
+                  data-action="dblclick->live#action" data-live-action-param="startEdit" data-live-tag-id-param="{{ node.id }}" data-live-name-param="{{ node.name }}">{{ node.displayName }}</span>
 
             <a class="tag-node__count" href="{{ path('APP_ADMIN_screenshot_index', {filters: {tags: {comparison: '=', value: node.id}}}) }}"
                title="{{ node.screenshotCount }} image(s) avec ce tag, {{ node.totalScreenshotCount }} avec les sous-tags">
@@ -28,7 +28,7 @@
                 <button type="button" title="Ajouter un sous-tag" data-action="live#action" data-live-action-param="startAdd" data-live-parent-id-param="{{ node.id }}"><i class="fa fa-plus"></i></button>
                 <button type="button" title="Renommer" data-action="live#action" data-live-action-param="startEdit" data-live-tag-id-param="{{ node.id }}" data-live-name-param="{{ node.name }}"><i class="fa fa-pen"></i></button>
                 <button type="button" class="is-danger" title="Supprimer"
-                        data-action="tag-tree#confirmDelete" data-tag-id="{{ node.id }}" data-tag-name="{{ node.name }}"
+                        data-action="tag-tree#confirmDelete" data-tag-id="{{ node.id }}" data-tag-name="{{ node.displayName }}"
                         data-screenshots="{{ node.screenshotCount }}" data-children="{{ node.children|length }}"><i class="fa fa-trash"></i></button>
             </span>
         {% endif %}

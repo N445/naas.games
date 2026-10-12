@@ -1,0 +1,223 @@
+{% set hero_screenshots = computed.heroScreenshots %}
+{% set featured_albums = computed.featuredAlbums %}
+{% set dirty = this.hasUnsavedChanges %}
+{% set stored = this.storedSettings %}
+<div {{ attributes.defaults({class: 'homepage-editor'}) }}>
+    <div class="homepage-editor__bar">
+        <div class="homepage-editor__status {{ dirty ? 'homepage-editor__status--dirty' }}" role="status">
+            <span class="homepage-editor__status-dot" aria-hidden="true"></span>
+            {% if dirty %}
+                Modifications non enregistrées
+            {% elseif notice %}
+                {{ notice }}
+            {% elseif stored.updatedAt %}
+                Enregistré le {{ stored.updatedAt|date('d/m/Y à H:i') }}{{ stored.updatedBy ? ' par ' ~ stored.updatedBy }}
+            {% else %}
+                Réglages par défaut
+            {% endif %}
+        </div>
+        <div class="homepage-editor__actions">
+            <twig:ea:Button type="button" icon="fa fa-rotate-left" :inactive="not dirty"
+                            data-action="live#action" data-live-action-param="discard">Annuler</twig:ea:Button>
+            <twig:ea:Button type="button" variant="primary" icon="fa fa-floppy-disk" :inactive="not dirty"
+                            data-action="live#action" data-live-action-param="save" data-loading="addAttribute(disabled)">Enregistrer</twig:ea:Button>
+        </div>
+    </div>
+
+    <div class="homepage-editor__layout">
+        <div>
+            <section class="dashboard-panel">
+                <h2 class="dashboard-panel__title"><i class="fa fa-heading me-2"></i>Textes du hero</h2>
+                <p class="homepage-editor__help">Laissez un champ vide pour utiliser le texte anglais, puis le texte par défaut du site (affiché en gris).</p>
+                <div class="homepage-languages">
+                    {% for language in [
+                        {code: 'en', label: 'Anglais (langue par défaut)', title: 'heroTitleEn', subtitle: 'heroSubtitleEn'},
+                        {code: 'fr', label: 'Français', title: 'heroTitleFr', subtitle: 'heroSubtitleFr'},
+                    ] %}
+                        <fieldset>
+                            <legend class="form-label fw-semibold fs-6"><span class="homepage-languages__flag">{{ language.code|upper }}</span>{{ language.label }}</legend>
+                            <label class="form-label small" for="homepage-{{ language.title }}">Titre</label>
+                            <input type="text" class="form-control mb-2" id="homepage-{{ language.title }}" maxlength="120"
+                                   placeholder="{{ 'hero.title'|trans({}, 'home', language.code) }}"
+                                   value="{{ attribute(this, language.title) }}" data-model="debounce(400)|{{ language.title }}">
+                            <label class="form-label small" for="homepage-{{ language.subtitle }}">Sous-titre</label>
+                            <textarea class="form-control" id="homepage-{{ language.subtitle }}" rows="3" maxlength="300"
+                                      placeholder="{{ 'hero.subtitle'|trans({}, 'home', language.code) }}"
+                                      data-model="debounce(400)|{{ language.subtitle }}">{{ attribute(this, language.subtitle) }}</textarea>
+                        </fieldset>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="dashboard-panel">
+                <div class="statistics-chart__header">
+                    <h2 class="dashboard-panel__title"><i class="fa fa-images me-2"></i>Images du hero <small class="text-muted">· {{ hero_screenshots|length }} sélectionnée{{ hero_screenshots|length > 1 ? 's' }}</small></h2>
+                    {% if hero_screenshots is not empty %}
+                        <twig:ea:Button type="button" size="sm" icon="fa fa-trash-can" data-action="live#action" data-live-action-param="clearScreenshots">Tout retirer</twig:ea:Button>
+                    {% endif %}
+                </div>
+                <p class="homepage-editor__help">Les images défilent dans cet ordre. Glissez-déposez pour réordonner, ou utilisez les flèches au clavier. Seuls les screenshots publiés s’affichent sur le site.</p>
+
+                {% if hero_screenshots is empty %}
+                    <div class="homepage-fallback">
+                        <p><i class="fa fa-wand-magic-sparkles me-1"></i> Aucune image choisie : la page affiche automatiquement les screenshots publiés les plus vus, puis les plus récents.</p>
+                        <div class="homepage-fallback__thumbs">
+                            {% for screenshot in computed.fallbackScreenshots %}
+                                <img src="{{ screenshot.path|imagine_filter('screenshot_thumbnail') }}" alt="{{ screenshot.title }}" title="{{ screenshot.title }}" loading="lazy">
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <ol class="homepage-picks" data-controller="home-sortable" data-home-sortable-action-value="sortScreenshots" aria-label="Images sélectionnées">
+                    {% for screenshot in hero_screenshots %}
+                        <li class="homepage-pick" id="homepage-pick-{{ screenshot.id }}" data-id="{{ screenshot.id }}">
+                            <img src="{{ screenshot.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy">
+                            <span class="homepage-pick__rank">{{ loop.index }}</span>
+                            {% if not screenshot.published %}<span class="badge text-bg-warning homepage-pick__flag">Non publié</span>{% endif %}
+                            <span class="homepage-pick__caption">{{ screenshot.title }}</span>
+                            <span class="homepage-pick__actions">
+                                <button type="button" class="btn btn-sm btn-light" title="Avancer" aria-label="Avancer « {{ screenshot.title }} »" {{ loop.first ? 'disabled' }}
+                                        data-action="live#action" data-live-action-param="moveScreenshot" data-live-screenshot-id-param="{{ screenshot.id }}" data-live-offset-param="-1"><i class="fa fa-arrow-left"></i></button>
+                                <button type="button" class="btn btn-sm btn-light" title="Reculer" aria-label="Reculer « {{ screenshot.title }} »" {{ loop.last ? 'disabled' }}
+                                        data-action="live#action" data-live-action-param="moveScreenshot" data-live-screenshot-id-param="{{ screenshot.id }}" data-live-offset-param="1"><i class="fa fa-arrow-right"></i></button>
+                                <button type="button" class="btn btn-sm btn-light" title="Retirer" aria-label="Retirer « {{ screenshot.title }} »"
+                                        data-action="live#action" data-live-action-param="removeScreenshot" data-live-screenshot-id-param="{{ screenshot.id }}"><i class="fa fa-xmark"></i></button>
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ol>
+
+                {% set candidate_count = computed.candidateCount %}
+                <div class="homepage-candidates__header">
+                    <h3>Ajouter depuis la photothèque <small class="text-muted">· {{ candidate_count }} image{{ candidate_count > 1 ? 's' }}</small></h3>
+                    <div class="homepage-candidates__filters">
+                        <div id="homepage-candidates-tag" class="homepage-candidates__tag" data-skip-morph>
+                            <select class="form-select form-select-sm" data-controller="tom-select" data-model="tagId" aria-label="Filtrer par tag" data-placeholder="Tous les tags">
+                                <option value="">Tous les tags</option>
+                                {% for label, id in computed.tagChoices %}
+                                    <option value="{{ id }}" {{ tagId == id ? 'selected' }}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input type="search" class="form-control form-control-sm homepage-candidates__search" placeholder="Rechercher par titre ou jeu…" aria-label="Rechercher un screenshot" data-model="debounce(300)|search">
+                    </div>
+                </div>
+                <div class="screenshot-grid screenshot-grid--compact">
+                    {% for screenshot in computed.candidates %}
+                        <button type="button" class="screenshot-card screenshot-card--selectable" title="Ajouter « {{ screenshot.title }} »" data-loading="addClass(is-loading)"
+                                data-action="live#action" data-live-action-param="addScreenshot" data-live-screenshot-id-param="{{ screenshot.id }}">
+                            <img src="{{ screenshot.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy">
+                            <span class="screenshot-card__add"><i class="fa fa-plus"></i></span>
+                            <span class="screenshot-card__caption">{{ screenshot.title }}</span>
+                        </button>
+                    {% else %}
+                        <p class="text-muted mb-0">Aucun screenshot publié à ajouter{{ search ? ' pour « ' ~ search ~ ' »' }}{{ tagId ? ' avec ce tag' }}.</p>
+                    {% endfor %}
+                </div>
+                {% set remaining_candidates = candidate_count - computed.candidates|length %}
+                {% if remaining_candidates > 0 %}
+                    <div class="homepage-candidates__more">
+                        <twig:ea:Button type="button" size="sm" icon="fa fa-chevron-down" data-action="live#action" data-live-action-param="showMoreCandidates">
+                            Afficher plus ({{ remaining_candidates }} restante{{ remaining_candidates > 1 ? 's' }})
+                        </twig:ea:Button>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="dashboard-panel">
+                <h2 class="dashboard-panel__title"><i class="fa fa-book-open me-2"></i>Albums mis en avant <small class="text-muted">· {{ featured_albums|length }} sélectionné{{ featured_albums|length > 1 ? 's' }}</small></h2>
+                <p class="homepage-editor__help">Cliquez sur un album pour l’ajouter ou le retirer. Sans sélection, les albums publiés les plus fournis sont affichés (4 au maximum).</p>
+
+                {% if featured_albums is not empty %}
+                    <ol class="homepage-order" data-controller="home-sortable" data-home-sortable-action-value="sortAlbums" aria-label="Ordre des albums">
+                        {% for highlight in featured_albums %}
+                            {% set album = highlight.album %}
+                            <li class="homepage-order__item" id="homepage-order-{{ album.id }}" data-id="{{ album.id }}">
+                                <i class="fa fa-grip-vertical text-muted" aria-hidden="true"></i>
+                                <strong>{{ loop.index }}.</strong> {{ album.title }}
+                                <button type="button" class="btn btn-sm btn-link" aria-label="Avancer « {{ album.title }} »" {{ loop.first ? 'disabled' }}
+                                        data-action="live#action" data-live-action-param="moveAlbum" data-live-album-id-param="{{ album.id }}" data-live-offset-param="-1"><i class="fa fa-arrow-left"></i></button>
+                                <button type="button" class="btn btn-sm btn-link" aria-label="Reculer « {{ album.title }} »" {{ loop.last ? 'disabled' }}
+                                        data-action="live#action" data-live-action-param="moveAlbum" data-live-album-id-param="{{ album.id }}" data-live-offset-param="1"><i class="fa fa-arrow-right"></i></button>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                {% endif %}
+
+                <div class="homepage-albums">
+                    {% for highlight in computed.albums %}
+                        {% set album = highlight.album %}
+                        {% set cover = highlight.cover %}
+                        {% set rank = this.rankOf(album.id) %}
+                        <button type="button" class="homepage-album" aria-pressed="{{ rank ? 'true' : 'false' }}"
+                                data-action="live#action" data-live-action-param="toggleAlbum" data-live-album-id-param="{{ album.id }}">
+                            <span class="homepage-album__cover">
+                                {% if cover %}
+                                    <img src="{{ cover.path|imagine_filter('album_cover') }}" alt="" loading="lazy">
+                                {% else %}
+                                    <i class="fa fa-images" aria-hidden="true"></i>
+                                {% endif %}
+                            </span>
+                            <span class="homepage-album__body">
+                                <span class="homepage-album__title">{{ album.title }}</span>
+                                <span class="homepage-album__count">{{ highlight.screenshotCount }} screenshot{{ highlight.screenshotCount > 1 ? 's' }} publié{{ highlight.screenshotCount > 1 ? 's' }}</span>
+                            </span>
+                            {% if rank %}<span class="homepage-album__rank">{{ rank }}</span>{% endif %}
+                        </button>
+                    {% else %}
+                        <p class="text-muted mb-0">Aucun album publié.</p>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+
+        <aside class="homepage-editor__aside">
+            <section class="dashboard-panel">
+                <div class="statistics-chart__header">
+                    <h2 class="dashboard-panel__title"><i class="fa fa-eye me-2"></i>Aperçu du hero</h2>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Langue de l’aperçu">
+                        {% for code in ['en', 'fr'] %}
+                            <input type="radio" class="btn-check" name="homepage-preview-locale" id="homepage-preview-{{ code }}" value="{{ code }}" data-model="previewLocale" {{ previewLocale == code ? 'checked' }}>
+                            <label class="btn btn-outline-secondary" for="homepage-preview-{{ code }}">{{ code|upper }}</label>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% set preview_image = (hero_screenshots is empty ? computed.fallbackScreenshots : hero_screenshots)|first %}
+                <div class="homepage-preview">
+                    {% if preview_image %}
+                        <img src="{{ preview_image.path|imagine_filter('album_cover') }}" alt="">
+                    {% endif %}
+                    <p class="homepage-preview__title">{{ this.previewTitle ?: 'hero.title'|trans({}, 'home', previewLocale) }}</p>
+                    <p class="homepage-preview__subtitle">{{ this.previewSubtitle ?: 'hero.subtitle'|trans({}, 'home', previewLocale) }}</p>
+                </div>
+            </section>
+
+            <section class="dashboard-panel homepage-sections">
+                <h2 class="dashboard-panel__title"><i class="fa fa-layer-group me-2"></i>Sections</h2>
+                {% for section in [
+                    {model: 'showStatistics', label: 'Présentation et chiffres', help: 'Texte d’introduction et compteurs animés.'},
+                    {model: 'showLatest', label: 'Dernières captures', help: 'Bandeau horizontal des derniers screenshots publiés.'},
+                    {model: 'showAlbums', label: 'Albums mis en avant', help: 'Cartes vers la galerie filtrée par album.'},
+                ] %}
+                    <div class="homepage-switch">
+                        <span class="ea-switch">
+                            <input type="checkbox" role="switch" class="ea-switch-input" id="homepage-{{ section.model }}" data-model="{{ section.model }}" {{ attribute(this, section.model) ? 'checked' }}>
+                            <span class="ea-switch-track" aria-hidden="true"><span class="ea-switch-thumb"></span></span>
+                        </span>
+                        <label for="homepage-{{ section.model }}">
+                            {{ section.label }}
+                            <small>{{ section.help }}</small>
+                        </label>
+                    </div>
+                    {% if section.model == 'showLatest' and showLatest %}
+                        <div class="homepage-sections__limit">
+                            <label class="form-label small mb-0" for="homepage-latestLimit">Nombre d’images</label>
+                            <input type="number" class="form-control form-control-sm" id="homepage-latestLimit" min="1" max="30" value="{{ latestLimit }}" data-model="on(change)|latestLimit">
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </section>
+        </aside>
+    </div>
+</div>

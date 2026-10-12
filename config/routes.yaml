@@ -1,5 +1,12 @@
-controllers:
+front:
     resource:
-        path: ../src/Controller/
-        namespace: App\Controller
+        path: ../src/Controller/Front/
+        namespace: App\Controller\Front
+    type: attribute
+    prefix:
+        en: ''
+        fr: '/fr'
+
+controllers:
+    resource: '../src/Controller/*.php'
     type: attribute

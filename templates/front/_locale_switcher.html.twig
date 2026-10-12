@@ -1,0 +1,11 @@
+{% set canonical_route = app.request.attributes.get('_route') %}
+<div class="locale-switcher" role="group" aria-label="{{ 'layout.language'|trans }}">
+    {% for locale, label in {en: 'EN', fr: 'FR'} %}
+        {% if canonical_route %}
+            {% set target = path(canonical_route, app.request.attributes.get('_route_params')|merge(app.request.query.all)|merge({_locale: locale})) %}
+        {% else %}
+            {% set target = path('APP_HOMEPAGE', {_locale: locale}) %}
+        {% endif %}
+        <a href="{{ target }}" hreflang="{{ locale }}" lang="{{ locale }}" class="locale-switcher__option" {% if app.request.locale == locale %}aria-current="true"{% endif %}>{{ label }}</a>
+    {% endfor %}
+</div>

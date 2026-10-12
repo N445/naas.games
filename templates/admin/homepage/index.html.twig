@@ -1,0 +1,11 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Page d’accueil{% endblock %}
+
+{% block page_actions %}
+    <twig:ea:Button htmlElement="a" href="{{ path('APP_HOMEPAGE') }}" target="_blank" icon="fa fa-arrow-up-right-from-square">Voir la page</twig:ea:Button>
+{% endblock %}
+
+{% block main %}
+    <twig:Admin:HomepageEditor />
+{% endblock %}

@@ -1,0 +1,95 @@
+{% trans_default_domain 'gallery' %}
+{% set file = screenshot.file %}
+{% set albums = screenshot.albums|filter(album => album.published) %}
+<article class="lightbox-detail" data-slug="{{ screenshot.slug }}"
+         data-hero="{{ screenshot.path|imagine_filter('front_hero') }}"
+         data-placeholder="{{ screenshot.path|imagine_filter('front_card') }}"
+         data-title="{{ screenshot.title }}"
+         data-tint="{{ screenshot.palette ? (screenshot.palette.colors|first).hex : '#141821' }}"
+         data-width="{{ file.width }}" data-height="{{ file.height }}">
+    <header class="lightbox-detail__header">
+        {% if screenshot.game %}
+            <a class="lightbox-detail__eyebrow" href="{{ path('APP_GALLERY', {game: screenshot.game.slug}) }}" data-action="gallery-lightbox#filter">{{ screenshot.game.name }}</a>
+        {% endif %}
+        <h2 class="lightbox-detail__title" id="gallery-lightbox-title">{{ screenshot.title }}</h2>
+        {% if screenshot.takenAt %}
+            <p class="lightbox-detail__date">
+                <span class="fa-regular fa-calendar" aria-hidden="true"></span>
+                <time datetime="{{ screenshot.takenAt|date('Y-m-d\\TH:i') }}">{{ 'gallery.lightbox.taken'|trans({'%date%': screenshot.takenAt|gallery_date('long')}) }}</time>
+            </p>
+        {% endif %}
+    </header>
+
+    {% if screenshot.description %}
+        <p class="lightbox-detail__description">{{ screenshot.description|nl2br }}</p>
+    {% endif %}
+
+    <ul class="lightbox-detail__stats">
+        <li><span class="fa-regular fa-eye" aria-hidden="true"></span> {{ 'gallery.lightbox.views'|trans({'%count%': screenshot.viewCount}) }}</li>
+        <li><span class="fa-solid fa-download" aria-hidden="true"></span> {{ 'gallery.lightbox.downloads'|trans({'%count%': screenshot.downloadCount}) }}</li>
+        <li><span class="fa-regular fa-image" aria-hidden="true"></span> {{ file.dimensions }}</li>
+    </ul>
+
+    <a class="gallery-button gallery-button--primary gallery-button--block" href="{{ path('APP_SCREENSHOT_DOWNLOAD', {slug: screenshot.slug}) }}" download>
+        <span class="fa-solid fa-download" aria-hidden="true"></span>
+        {{ 'gallery.lightbox.download'|trans }} <span class="lightbox-detail__size">{{ file.size|file_size }}</span>
+    </a>
+
+    {% if albums is not empty %}
+        <section class="lightbox-detail__section">
+            <h3 class="lightbox-detail__heading">{{ 'gallery.lightbox.albums'|trans }}</h3>
+            <ul class="gallery-chips">
+                {% for album in albums %}
+                    <li><a class="gallery-chip" href="{{ path('APP_GALLERY', {album: album.slug}) }}" data-action="gallery-lightbox#filter">{{ album.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
+    {% if screenshot.tags is not empty %}
+        <section class="lightbox-detail__section">
+            <h3 class="lightbox-detail__heading">{{ 'gallery.lightbox.tags'|trans }}</h3>
+            <ul class="gallery-chips">
+                {% for tag in screenshot.tags %}
+                    <li><a class="gallery-chip gallery-chip--tag" href="{{ path('APP_GALLERY', {tag: tag.slug}) }}" title="{{ tag.label }}" data-action="gallery-lightbox#filter">{{ tag.displayName }}</a></li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
+    {% if screenshot.palette %}
+        <section class="lightbox-detail__section">
+            <h3 class="lightbox-detail__heading">{{ 'gallery.lightbox.palette'|trans }}</h3>
+            <ul class="lightbox-palette">
+                {% for color in screenshot.palette.colors %}
+                    {% set bucket = color.hex|gallery_color %}
+                    <li style="--swatch: {{ color.hex }}; --share: {{ max(color.share, 4) }}">
+                        <a href="{{ path('APP_GALLERY', {color: bucket.value}) }}" data-action="gallery-lightbox#filter"
+                           aria-label="{{ 'gallery.lightbox.palette_filter'|trans({'%color%': ('gallery.colors.' ~ bucket.value)|trans}) }} ({{ color.hex }}, {{ color.share }} %)">
+                            <span class="lightbox-palette__hex" aria-hidden="true">{{ color.hex }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
+    {% if similar is not empty %}
+        <section class="lightbox-detail__section">
+            <h3 class="lightbox-detail__heading">{{ 'gallery.lightbox.similar'|trans }}</h3>
+            <ul class="lightbox-similar">
+                {% for other in similar %}
+                    <li>
+                        <a href="{{ path('APP_GALLERY', {screenshot: other.slug}) }}" style="--tint: {{ other.palette ? (other.palette.colors|first).hex : '#141821' }}"
+                           data-action="gallery-lightbox#open" data-gallery-lightbox-slug-param="{{ other.slug }}"
+                           data-hero="{{ other.path|imagine_filter('front_hero') }}">
+                            <img src="{{ other.path|imagine_filter('screenshot_thumbnail') }}" width="480" height="300" alt="{{ other.title }}" loading="lazy" decoding="async">
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
+    <p class="lightbox-detail__hint">{{ 'gallery.lightbox.keyboard'|trans }}</p>
+</article>

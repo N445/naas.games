@@ -1,0 +1,31 @@
+{% trans_default_domain 'home' %}
+<section class="home-cta" aria-labelledby="home-cta-title">
+    {% if marquee is not empty %}
+        {% set repeat = max(1, (8 / marquee|length)|round(0, 'ceil')) %}
+        <div class="home-cta__marquee" aria-hidden="true">
+            {% for row in ['forward', 'reverse'] %}
+                <div class="home-cta__row home-cta__row--{{ row }}">
+                    {% for copy in 1..2 %}
+                        <div class="home-cta__set">
+                            {% for pass in 1..repeat %}
+                                {% for screenshot in (row == 'reverse' ? marquee|reverse : marquee) %}
+                                    <img src="{{ screenshot.path|imagine_filter('front_thumb') }}" width="{{ screenshot.file.width }}" height="{{ screenshot.file.height }}" alt="" loading="lazy" decoding="async">
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="home-cta__content" data-controller="home-reveal">
+        <h2 class="home-cta__title" id="home-cta-title" data-home-reveal-target="item">{{ 'cta.title'|trans }}</h2>
+        <p class="home-cta__text" data-home-reveal-target="item">{{ 'cta.text'|trans }}</p>
+        <div data-home-reveal-target="item">
+            <a class="home-button home-button--primary home-button--large" href="{{ path('APP_GALLERY') }}">
+                {{ 'cta.button'|trans }} {{ ux_icon('fa7-solid:arrow-right', {'aria-hidden': 'true'}) }}
+            </a>
+        </div>
+    </div>
+</section>

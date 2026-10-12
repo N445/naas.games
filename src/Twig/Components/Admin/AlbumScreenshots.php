@@ -18,12 +18,16 @@ final class AlbumScreenshots
     use DefaultActionTrait;
 
     private const int CANDIDATE_LIMIT = 18;
+    private const int PAGE_SIZE = 48;
 
     #[LiveProp]
     public Album $album;
 
     #[LiveProp(writable: true)]
     public string $search = '';
+
+    #[LiveProp]
+    public int $limit = self::PAGE_SIZE;
 
     public function __construct(
         private readonly ScreenshotRepository $screenshots,
@@ -50,6 +54,33 @@ final class AlbumScreenshots
     {
         $this->find($screenshotId)->removeAlbum($this->album);
         $this->entityManager->flush();
+    }
+
+    #[LiveAction]
+    public function delete(#[LiveArg] int $screenshotId): void
+    {
+        $this->entityManager->remove($this->find($screenshotId));
+        $this->entityManager->flush();
+        $this->entityManager->refresh($this->album);
+    }
+
+    #[LiveAction]
+    public function showMore(): void
+    {
+        $this->limit += self::PAGE_SIZE;
+    }
+
+    /**
+     * @return list<Screenshot>
+     */
+    public function getScreenshots(): array
+    {
+        return $this->screenshots->findInAlbum($this->album, $this->limit);
+    }
+
+    public function getRemaining(): int
+    {
+        return max(0, $this->album->countScreenshots() - $this->limit);
     }
 
     /**

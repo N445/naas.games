@@ -5,5 +5,5 @@
     {% if not screenshot.published %}<span class="screenshot-thumbnail__flag"><i class="fa fa-eye-slash"></i></span>{% endif %}
 </a>
 <div id="{{ lightbox_id }}" class="ea-lightbox">
-    <img src="{{ screenshot.path|imagine_filter('screenshot_preview') }}" alt="{{ screenshot.title }}">
+    <img src="{{ screenshot.path|imagine_filter('screenshot_preview') }}" alt="{{ screenshot.title }}" loading="lazy">
 </div>

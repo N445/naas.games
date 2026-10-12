@@ -1,15 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="{{ app.request.locale }}" data-bs-theme="dark">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% block title %}Naas Official Website{% endblock %}</title>
+        <title>{% block title %}Naas{% endblock %}</title>
+        <meta name="description" content="{% block meta_description %}{{ 'layout.meta_description'|trans }}{% endblock %}">
+        {% block alternate_links %}{% endblock %}
+        {% block social_meta %}{% endblock %}
+        {% block structured_data %}{% endblock %}
 
         <link rel="icon" type="image/png" href="{{ asset('favicon/favicon-96x96.png') }}" sizes="96x96" />
-        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon/favicon.svg') }}" />
         <link rel="shortcut icon" href="{{ asset('favicon/favicon.ico') }}" />
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('favicon/apple-touch-icon.png') }}" />
         <link rel="manifest" href="{{ asset('favicon/site.webmanifest') }}" />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap">
 
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
@@ -35,7 +42,7 @@
         </script>
         <!-- End Matomo Code -->
     </head>
-    <body>
+    <body class="{% block body_class %}{% endblock %}">
         {% block body %}{% endblock %}
     </body>
 </html>

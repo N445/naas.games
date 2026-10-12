@@ -18,6 +18,7 @@ final class SecurityController extends AbstractController
 
         return $this->render('@EasyAdmin/page/login.html.twig', [
             'page_title' => 'Naas Games',
+            'favicon_path' => '/favicon/favicon-96x96.png',
             'action' => $this->generateUrl('APP_LOGIN'),
             'last_username' => $authenticationUtils->getLastUsername(),
             'error' => $authenticationUtils->getLastAuthenticationError(),

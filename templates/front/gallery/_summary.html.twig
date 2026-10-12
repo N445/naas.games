@@ -1,0 +1,35 @@
+{% trans_default_domain 'gallery' %}
+<div class="gallery-summary" data-gallery-region="summary"
+     data-status="{{ 'gallery.results.status'|trans({'%count%': page.total}) }}"
+     data-show-results="{{ 'gallery.filters.show_results'|trans({'%count%': page.total}) }}">
+    <p class="gallery-summary__count"><strong>{{ 'gallery.results.count'|trans({'%count%': page.total}) }}</strong></p>
+    {% if not filters.empty %}
+        <ul class="gallery-pills" aria-label="{{ 'gallery.filters.active'|trans }}">
+            {% for key in filters.activeKeys %}
+                {% set value = filters.value(key) %}
+                {% if key == 'month' %}
+                    {% set label = value|gallery_month ~ ' ' ~ filters.value('year') %}
+                {% elseif key in ['from', 'to'] %}
+                    {% set label = ('gallery.pill.' ~ key)|trans({'%value%': date(value)|gallery_date}) %}
+                {% elseif key == 'color' %}
+                    {% set label = 'gallery.pill.color'|trans({'%value%': ('gallery.colors.' ~ value)|trans}) %}
+                {% elseif key == 'q' %}
+                    {% set label = 'gallery.pill.q'|trans({'%value%': value}) %}
+                {% else %}
+                    {% set label = facets.label(key, value) %}
+                {% endif %}
+                <li>
+                    <a class="gallery-pill" id="gallery-pill-{{ key }}" href="{{ path('APP_GALLERY', filters.without(key, key == 'year' ? 'month' : key).toQuery) }}"
+                       aria-label="{{ 'gallery.filters.remove'|trans({'%label%': label}) }}"
+                       data-action="gallery-explorer#navigate">
+                        <span>{{ label }}</span>
+                        <span class="fa-solid fa-xmark" aria-hidden="true"></span>
+                    </a>
+                </li>
+            {% endfor %}
+            <li>
+                <a class="gallery-pill gallery-pill--clear" id="gallery-pill-clear" href="{{ path('APP_GALLERY', filters.cleared.toQuery) }}" data-action="gallery-explorer#navigate">{{ 'gallery.filters.clear_all'|trans }}</a>
+            </li>
+        </ul>
+    {% endif %}
+</div>

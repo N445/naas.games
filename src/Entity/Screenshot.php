@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ScreenshotRepository::class)]
 #[ORM\Index(fields: ['published'])]
 #[ORM\Index(fields: ['takenAt'])]
+#[ORM\Index(columns: ['file_hash'])]
 class Screenshot
 {
     use TimestampableEntity;
@@ -261,6 +262,11 @@ class Screenshot
     public function usePalette(Palette $palette): void
     {
         $this->palette = $palette->toArray();
+    }
+
+    public function rememberHash(string $hash): void
+    {
+        $this->file = $this->file->withHash($hash);
     }
 
     public function getFile(): StoredImage

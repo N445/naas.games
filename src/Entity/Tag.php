@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TagRepository;
+use App\Tagging\TagName;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -73,6 +74,11 @@ class Tag
         return $this;
     }
 
+    public function getDisplayName(): string
+    {
+        return TagName::display((string) $this->name);
+    }
+
     public function getSlug(): ?string
     {
         return $this->slug;
@@ -105,7 +111,7 @@ class Tag
 
     public function getLabel(): string
     {
-        return $this->joinLineage(self::LABEL_SEPARATOR);
+        return implode(self::LABEL_SEPARATOR, array_map(static fn (Tag $tag): string => $tag->getDisplayName(), [...$this->getAncestors(), $this]));
     }
 
     public function countScreenshots(): int

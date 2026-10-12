@@ -1,0 +1,38 @@
+meta:
+    title: "Naas — Screenshots du 'verse"
+    description: "Naas capture Star Citizen et Arc Raiders : screenshots cinématiques, albums et voyages à travers le 'verse."
+hero:
+    eyebrow: Star Citizen · Arc Raiders
+    title: Instants du 'verse
+    subtitle: Des screenshots cinématiques capturés dans Star Citizen et Arc Raiders. Explorez les étoiles, une image à la fois.
+    cta_gallery: Explorer la galerie
+    cta_links: Suivre Naas
+    scroll: Défiler
+    slides: Screenshots à la une
+    slide: "Afficher le screenshot %number% : %title%"
+    pause: Mettre le diaporama en pause
+    play: Relancer le diaporama
+statement:
+    label: À propos
+    text: "Chaque image est un instant où je me suis arrêté pour regarder : un lever de soleil sur une géante gazeuse, un vaisseau saisi en pleine poussée, un avant-poste silencieux au bout du monde."
+statistics:
+    label: En chiffres
+    screenshots: "Screenshot|Screenshots"
+    albums: "Album|Albums"
+    games: "Jeu|Jeux"
+    views: "Vue|Vues"
+latest:
+    eyebrow: Tout juste sortis du hangar
+    title: Dernières captures
+    all: Voir tous les screenshots
+    drag: Faites défiler pour explorer
+albums:
+    eyebrow: Collections
+    title: Albums à la une
+    count: "{0} Pas encore de screenshot|{1} %count% screenshot|]1,Inf[ %count% screenshots"
+    open: "Ouvrir l’album %title%"
+    all: Parcourir tous les albums
+cta:
+    title: Prêt pour le grand voyage ?
+    text: Des centaines d’images, classées par jeu, album et tag. Téléchargez vos préférées en pleine résolution.
+    button: Ouvrir la galerie

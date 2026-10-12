@@ -1,0 +1,38 @@
+meta:
+    title: "Naas — Screenshots from the 'verse"
+    description: "Naas captures Star Citizen and Arc Raiders: cinematic screenshots, albums and journeys across the 'verse."
+hero:
+    eyebrow: Star Citizen · Arc Raiders
+    title: Frames from the 'verse
+    subtitle: Cinematic screenshots captured across Star Citizen and Arc Raiders. Explore the stars, one frame at a time.
+    cta_gallery: Explore the gallery
+    cta_links: Follow Naas
+    scroll: Scroll
+    slides: Featured screenshots
+    slide: "Show screenshot %number%: %title%"
+    pause: Pause the slideshow
+    play: Play the slideshow
+statement:
+    label: About
+    text: "Every frame is a moment I stopped to look at: a sunrise over a gas giant, a ship caught mid-burn, a quiet outpost at the edge of nowhere."
+statistics:
+    label: In numbers
+    screenshots: "Screenshot|Screenshots"
+    albums: "Album|Albums"
+    games: "Game|Games"
+    views: "View|Views"
+latest:
+    eyebrow: Fresh from the hangar
+    title: Latest captures
+    all: See all screenshots
+    drag: Scroll to explore
+albums:
+    eyebrow: Collections
+    title: Featured albums
+    count: "{0} No screenshots yet|{1} %count% screenshot|]1,Inf[ %count% screenshots"
+    open: "Open the album %title%"
+    all: Browse every album
+cta:
+    title: Ready for the full journey?
+    text: Hundreds of frames, sorted by game, album and tag. Download your favourites in full resolution.
+    button: Open the gallery

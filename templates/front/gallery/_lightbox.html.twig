@@ -1,0 +1,40 @@
+{% trans_default_domain 'gallery' %}
+<dialog class="lightbox" aria-labelledby="gallery-lightbox-title" aria-describedby="gallery-lightbox-status"
+        data-gallery-lightbox-target="dialog" data-lenis-prevent
+        data-action="cancel->gallery-lightbox#cancel close->gallery-lightbox#closed keydown->gallery-lightbox#keydown click->gallery-lightbox#backdrop"
+        {{ selected ? 'open' }}>
+    <div class="lightbox__frame">
+        <div class="lightbox__stage" data-gallery-lightbox-target="stage"
+             data-action="pointerdown->gallery-lightbox#swipeStart pointerup->gallery-lightbox#swipeEnd pointercancel->gallery-lightbox#swipeCancel">
+            <div class="lightbox__media" data-gallery-lightbox-target="media"
+                 {% if selected %}style="--ratio: {{ (selected.file.width / max(selected.file.height, 1))|round(4) }}; --tint: {{ selected.palette ? (selected.palette.colors|first).hex : '#141821' }}"{% endif %}>
+                <img class="lightbox__placeholder" data-gallery-lightbox-target="placeholder" alt=""
+                     {% if selected %}src="{{ selected.path|imagine_filter('front_card') }}"{% endif %}>
+                <img class="lightbox__image" data-gallery-lightbox-target="image" data-action="load->gallery-lightbox#imageLoaded error->gallery-lightbox#imageLoaded"
+                     {% if selected %}src="{{ selected.path|imagine_filter('front_hero') }}" alt="{{ selected.title }}"{% else %}alt=""{% endif %}>
+                <div class="lightbox__spinner" aria-hidden="true"></div>
+            </div>
+            <button type="button" class="lightbox__nav lightbox__nav--previous" data-gallery-lightbox-target="previous" data-action="gallery-lightbox#previous">
+                <span class="fa-solid fa-arrow-left" aria-hidden="true"></span>
+                <span class="visually-hidden">{{ 'gallery.lightbox.previous'|trans }}</span>
+            </button>
+            <button type="button" class="lightbox__nav lightbox__nav--next" data-gallery-lightbox-target="next" data-action="gallery-lightbox#next">
+                <span class="fa-solid fa-arrow-right" aria-hidden="true"></span>
+                <span class="visually-hidden">{{ 'gallery.lightbox.next'|trans }}</span>
+            </button>
+        </div>
+        <div class="lightbox__panel" tabindex="-1" data-gallery-lightbox-target="panel" data-lenis-prevent>
+            {% if selected %}
+                {{ include('front/gallery/_detail.html.twig', {screenshot: selected}) }}
+            {% else %}
+                <h2 class="visually-hidden" id="gallery-lightbox-title">{{ 'gallery.lightbox.label'|trans }}</h2>
+            {% endif %}
+        </div>
+        <button type="button" class="gallery-icon-button lightbox__close" data-action="gallery-lightbox#close" autofocus>
+            <span class="fa-solid fa-xmark" aria-hidden="true"></span>
+            <span class="visually-hidden">{{ 'gallery.lightbox.close'|trans }}</span>
+        </button>
+        <p class="visually-hidden" id="gallery-lightbox-status" role="status" data-gallery-lightbox-target="status"
+           data-loading="{{ 'gallery.lightbox.loading'|trans }}" data-error="{{ 'gallery.results.error'|trans }}"></p>
+    </div>
+</dialog>

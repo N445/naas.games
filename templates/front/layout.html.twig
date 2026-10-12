@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block body_class %}front{% endblock %}
+
+{% block alternate_links %}
+    {% set route = app.request.attributes.get('_route') %}
+    {% if route %}
+        {% set route_params = app.request.attributes.get('_route_params')|filter((value, key) => key != '_locale')|merge(canonical_query|default({})) %}
+        <link rel="canonical" href="{{ url(route, route_params) }}">
+        {% for locale in ['en', 'fr'] %}
+            <link rel="alternate" hreflang="{{ locale }}" href="{{ url(route, route_params|merge({_locale: locale})) }}">
+        {% endfor %}
+        <link rel="alternate" hreflang="x-default" href="{{ url(route, route_params|merge({_locale: 'en'})) }}">
+    {% endif %}
+{% endblock %}
+
+{% block social_meta %}
+    {% set share_title = block('share_title') is defined ? block('share_title')|trim : block('title')|trim %}
+    {% set share_description = block('meta_description')|trim %}
+    {% set share_image = block('share_image') is defined ? block('share_image')|trim : absolute_url(asset('favicon/web-app-manifest-512x512.png')) %}
+    <meta property="og:site_name" content="Naas">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ share_title|raw }}">
+    <meta property="og:description" content="{{ share_description|raw }}">
+    <meta property="og:url" content="{{ app.request.uri|split('?')|first }}">
+    <meta property="og:image" content="{{ share_image }}">
+    <meta property="og:locale" content="{{ app.request.locale == 'fr' ? 'fr_FR' : 'en_US' }}">
+    <meta property="og:locale:alternate" content="{{ app.request.locale == 'fr' ? 'en_US' : 'fr_FR' }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@NaasOff">
+    <meta name="twitter:title" content="{{ share_title|raw }}">
+    <meta name="twitter:description" content="{{ share_description|raw }}">
+    <meta name="twitter:image" content="{{ share_image }}">
+{% endblock %}
+
+{% block body %}
+    <a class="skip-link" href="#main">{{ 'layout.skip_to_content'|trans }}</a>
+    {{ include('front/_header.html.twig') }}
+    <main id="main" class="front-main">
+        {% block main %}{% endblock %}
+    </main>
+    <twig:Front:SiteFooter />
+{% endblock %}

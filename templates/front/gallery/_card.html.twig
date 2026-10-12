@@ -1,0 +1,32 @@
+{% set file = screenshot.file %}
+{% set ratio = file.width / max(file.height, 1) %}
+{% set colors = screenshot.palette ? screenshot.palette.colors : [] %}
+<li class="gallery-card" data-gallery-explorer-target="card" data-slug="{{ screenshot.slug }}" data-flip-id="{{ screenshot.slug }}"
+    style="--ratio: {{ ratio|round(4) }}; --tint: {{ colors[0].hex ?? '#141821' }}; --tint-alt: {{ colors[1].hex ?? colors[0].hex ?? '#1d2230' }}">
+    <a class="gallery-card__link" id="gallery-card-{{ screenshot.slug }}"
+       href="{{ path('APP_GALLERY', filters.toQuery|merge({screenshot: screenshot.slug})) }}"
+       data-action="gallery-lightbox#open" data-gallery-lightbox-slug-param="{{ screenshot.slug }}"
+       data-hero="{{ screenshot.path|imagine_filter('front_hero') }}">
+        <span class="gallery-card__frame" style="padding-bottom: {{ (100 / ratio)|round(3) }}%; {{ include('front/_lqip.html.twig', {image: screenshot}) }}">
+            <img class="gallery-card__image"
+                 src="{{ screenshot.path|imagine_filter('front_card') }}"
+                 srcset="{{ include('front/_srcset.html.twig', {image: screenshot}) }}"
+                 sizes="(max-width: 560px) 100vw, (max-width: 1023px) 70vw, {{ min((ratio * 420)|round, 1100) }}px"
+                 width="{{ file.width }}" height="{{ file.height }}" alt=""
+                 {{ eager ? 'fetchpriority="high"' : 'loading="lazy"' }} decoding="async">
+        </span>
+        <span class="gallery-card__overlay">
+            <span class="gallery-card__title">{{ screenshot.title }}</span>
+            <span class="gallery-card__meta">
+                {%- if screenshot.takenAt %}<time datetime="{{ screenshot.takenAt|date('Y-m-d') }}">{{ screenshot.takenAt|gallery_date }}</time>{% endif -%}
+                {%- if screenshot.takenAt and screenshot.game %} · {% endif -%}
+                {%- if screenshot.game %}{{ screenshot.game.name }}{% endif -%}
+            </span>
+            {% if screenshot.tags is not empty %}
+                <span class="gallery-card__tags">
+                    {% for tag in screenshot.tags|slice(0, 3) %}<span class="gallery-card__tag">{{ tag.displayName }}</span>{% endfor %}
+                </span>
+            {% endif %}
+        </span>
+    </a>
+</li>

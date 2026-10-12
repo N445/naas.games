@@ -33,6 +33,11 @@ class ScreenshotRepository extends ServiceEntityRepository
         return array_map(intval(...), $totals) + ['unsorted' => $this->countUnsorted()];
     }
 
+    public function findOneByHash(string $hash): ?Screenshot
+    {
+        return $this->findOneBy(['file.hash' => $hash]);
+    }
+
     public function findRandomPublished(): ?Screenshot
     {
         $ids = $this->createQueryBuilder('screenshot')
@@ -100,6 +105,22 @@ class ScreenshotRepository extends ServiceEntityRepository
     /**
      * @return list<Screenshot>
      */
+    /**
+     * @return list<Screenshot>
+     */
+    public function findInAlbum(Album $album, int $limit): array
+    {
+        return $this->createQueryBuilder('screenshot')
+            ->innerJoin('screenshot.albums', 'album', 'WITH', 'album = :album')
+            ->setParameter('album', $album)
+            ->orderBy('screenshot.takenAt', 'DESC')
+            ->addOrderBy('screenshot.createdAt', 'DESC')
+            ->addOrderBy('screenshot.id', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findReviewedOthers(Screenshot $screenshot): array
     {
         $candidates = $this->createQueryBuilder('screenshot')

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+{% for page in pages %}
+{% for locale in locales %}
+    <url>
+        <loc>{{ url(page, {_locale: locale}) }}</loc>
+{% for alternate in locales %}
+        <xhtml:link rel="alternate" hreflang="{{ alternate }}" href="{{ url(page, {_locale: alternate}) }}"/>
+{% endfor %}
+        <changefreq>{{ page == 'APP_LINKS' ? 'monthly' : 'weekly' }}</changefreq>
+    </url>
+{% endfor %}
+{% endfor %}
+{% for screenshot in screenshots %}
+{% for locale in locales %}
+    <url>
+        <loc>{{ url('APP_GALLERY', {_locale: locale, screenshot: screenshot.slug}) }}</loc>
+{% for alternate in locales %}
+        <xhtml:link rel="alternate" hreflang="{{ alternate }}" href="{{ url('APP_GALLERY', {_locale: alternate, screenshot: screenshot.slug}) }}"/>
+{% endfor %}
+        <lastmod>{{ screenshot.updatedAt|date('Y-m-d') }}</lastmod>
+        <image:image>
+            <image:loc>{{ screenshot.path|imagine_filter('front_hero_md') }}</image:loc>
+            <image:title>{{ screenshot.title }}</image:title>
+        </image:image>
+    </url>
+{% endfor %}
+{% endfor %}
+</urlset>

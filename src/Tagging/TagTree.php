@@ -43,6 +43,29 @@ final readonly class TagTree
         return $this->roots;
     }
 
+    /**
+     * @return list<int> the tag followed by all its descendants, or an empty list if the tag is unknown
+     */
+    public function subtreeIds(int $tagId): array
+    {
+        foreach ($this->roots as $root) {
+            $found = $root->find($tagId);
+            if (null !== $found) {
+                return $found->subtreeIds();
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * @return array<string, int> full tag path (« Vehicule › Drake ») => tag id
+     */
+    public function labelledChoices(): array
+    {
+        return array_merge([], ...array_map(static fn (TagNode $root): array => $root->labelledChoices(''), $this->roots));
+    }
+
     public function isEmpty(): bool
     {
         return [] === $this->roots;

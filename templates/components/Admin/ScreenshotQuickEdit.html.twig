@@ -53,7 +53,7 @@
             {% endif %}
             {% for tag in screenshot.tags %}
                 <span class="chip chip--tag" title="{{ tag.path }}">{{ include('admin/_tag_label.html.twig') }}
-                    <button type="button" aria-label="Retirer {{ tag.name }}" data-action="live#action" data-live-action-param="removeTag" data-live-tag-id-param="{{ tag.id }}">×</button>
+                    <button type="button" aria-label="Retirer {{ tag.displayName }}" data-action="live#action" data-live-action-param="removeTag" data-live-tag-id-param="{{ tag.id }}">×</button>
                 </span>
             {% endfor %}
             <input type="text" class="chip-input" placeholder="+ tag ou chemin/du/tag" data-model="norender|newTag"

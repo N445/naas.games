@@ -39,7 +39,7 @@ final class DashboardController extends AbstractDashboardController
     {
         return Dashboard::new()
             ->setTitle('Naas Games')
-            ->setFaviconPath('favicon/favicon.svg');
+            ->setFaviconPath('favicon/favicon-96x96.png');
     }
 
     public function configureAssets(): Assets
@@ -60,6 +60,7 @@ final class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(ShipCrudController::class, 'Vaisseaux SC', 'fa fa-rocket');
 
         yield MenuItem::section('Site');
+        yield MenuItem::linkTo(HomepageController::class, 'Page d’accueil', 'fa fa-house')->setAction('index');
         yield MenuItem::linkTo(LinkCrudController::class, 'Liens', 'fa fa-link');
 
         yield MenuItem::section('Administration');

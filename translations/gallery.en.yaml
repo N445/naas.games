@@ -1,0 +1,85 @@
+gallery:
+    meta:
+        title: Gallery — Naas
+        description: Browse every Star Citizen and Arc Raiders screenshot by Naas. Filter by game, album, tag, date or colour.
+    hero:
+        eyebrow: Explorer
+        title: The gallery
+        lead: Every capture from the 'verse and beyond. Search, filter and dive into the details.
+    search:
+        label: Search screenshots
+        placeholder: Search a ship, a place, a tag…
+        shortcut: Press / to search
+        clear: Clear search
+    filters:
+        title: Filters
+        open: Filters
+        close: Close filters
+        show_results: '{0} No results|{1} Show 1 result|]1,Inf[ Show %count% results'
+        active: Active filters
+        clear_all: Clear all
+        remove: 'Remove filter: %label%'
+    facets:
+        games: Game
+        albums: Albums
+        date: Date taken
+        months: 'Months of %year%'
+        range: Custom range
+        from: From
+        to: To
+        apply: Apply
+        colors: Dominant colour
+        tags: Tags
+        tag_search: Search tags
+        tag_search_placeholder: Filter tags…
+        tag_expand: 'Show tags under %name%'
+        no_tags: No tag matches these results.
+        no_options: Nothing to filter here yet.
+    colors:
+        red: Red
+        orange: Orange
+        yellow: Yellow
+        green: Green
+        cyan: Cyan
+        blue: Blue
+        purple: Purple
+        pink: Pink
+        neutral: Neutral
+    sort:
+        label: Sort by
+        taken: Latest taken
+        uploaded: Latest uploaded
+        views: Most viewed
+        downloads: Most downloaded
+    pill:
+        q: 'Search: “%value%”'
+        year: '%value%'
+        month: '%value%'
+        from: 'From %value%'
+        to: 'Until %value%'
+        color: 'Colour: %value%'
+    results:
+        title: Results
+        count: '{0} No screenshots|{1} 1 screenshot|]1,Inf[ %count% screenshots'
+        status: '{0} No screenshot matches these filters.|{1} 1 screenshot found.|]1,Inf[ %count% screenshots found.'
+        empty_title: Nothing in this sector
+        empty_text: No screenshot matches these filters. Try removing one, or start over.
+        load_more: Load more
+        loading: Loading…
+        error: Something went wrong while loading. Please try again.
+    lightbox:
+        label: Screenshot details
+        close: Close
+        previous: Previous screenshot
+        next: Next screenshot
+        taken: Taken on %date%
+        views: '{0} No views|{1} 1 view|]1,Inf[ %count% views'
+        downloads: '{0} No downloads|{1} 1 download|]1,Inf[ %count% downloads'
+        download: Download
+        albums: Albums
+        tags: Tags
+        palette: Palette
+        palette_filter: 'Filter by colour: %color%'
+        similar: Similar screenshots
+        loading: Loading screenshot…
+        keyboard: Use ← and → to browse, Esc to close.

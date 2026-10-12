@@ -1,0 +1,9 @@
+{% trans_default_domain 'gallery' %}
+<div class="gallery-more" data-gallery-explorer-target="more"
+     {% if page.hasMore %}data-url="{{ path('APP_GALLERY_MORE', filters.toQuery|merge({page: page.nextNumber})) }}"{% endif %}>
+    {% if page.hasMore %}
+        <a class="gallery-button" id="gallery-load-more" href="{{ path('APP_GALLERY', filters.toQuery|merge({page: page.nextNumber})) }}" data-action="gallery-explorer#loadMore">
+            {{ 'gallery.results.load_more'|trans }}
+        </a>
+    {% endif %}
+</div>

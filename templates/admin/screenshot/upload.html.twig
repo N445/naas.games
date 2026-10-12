@@ -50,6 +50,15 @@
 
         <ul class="upload-errors" data-screenshot-upload-target="errors"></ul>
 
+        {% set unsorted_url = path('APP_ADMIN_screenshot_index', {filters: {classification: constant('App\\Controller\\Admin\\Filter\\ClassificationFilter::WITHOUT_ALBUM')}}) %}
+        <div class="upload-done" data-screenshot-upload-target="done" hidden>
+            <twig:ea:Button htmlElement="a" href="{{ path('APP_ADMIN_screenshot_index') }}" icon="fa fa-images">Ouvrir la photothèque</twig:ea:Button>
+            <twig:ea:Button htmlElement="a" href="{{ unsorted_url }}" icon="fa fa-inbox">Images sans album</twig:ea:Button>
+            <span class="upload-done__hint">Le traitement (couleurs, miniatures, reconnaissance, tags IA) continue en arrière-plan.</span>
+        </div>
+
+        <ul class="upload-list" data-screenshot-upload-target="list"></ul>
+
         <div class="screenshot-grid screenshot-grid--editable" data-screenshot-upload-target="results"></div>
     </div>
 {% endblock %}

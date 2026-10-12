@@ -20,7 +20,19 @@ class StoredImage
         private int $width,
         #[ORM\Column]
         private int $height,
+        #[ORM\Column(length: 40, nullable: true)]
+        private ?string $hash = null,
     ) {
+    }
+
+    public function getHash(): ?string
+    {
+        return $this->hash;
+    }
+
+    public function withHash(string $hash): self
+    {
+        return new self($this->path, $this->originalName, $this->mimeType, $this->size, $this->width, $this->height, $hash);
     }
 
     public function getPath(): string

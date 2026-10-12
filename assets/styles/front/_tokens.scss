@@ -1,0 +1,25 @@
+:root {
+    --naas-bg: #07080b;
+    --naas-bg-elevated: #0e1016;
+    --naas-surface: rgba(255, 255, 255, .04);
+    --naas-surface-hover: rgba(255, 255, 255, .08);
+    --naas-border: rgba(255, 255, 255, .1);
+    --naas-text: #f3f4f6;
+    --naas-muted: rgba(243, 244, 246, .62);
+    --naas-accent: #ff4506;
+    --naas-accent-soft: rgba(255, 69, 6, .16);
+    --naas-radius-sm: 10px;
+    --naas-radius: 20px;
+    --naas-radius-lg: 28px;
+    --naas-header-height: 72px;
+    --naas-gutter: clamp(16px, 4vw, 48px);
+    --naas-max-width: 1440px;
+    --naas-font: "Montserrat", system-ui, sans-serif;
+    --naas-ease: cubic-bezier(.22, 1, .36, 1);
+    --naas-text-xs: .78rem;
+    --naas-text-sm: .9rem;
+    --naas-text-lg: clamp(1.1rem, 1rem + .4vw, 1.3rem);
+    --naas-title-md: clamp(1.6rem, 1.2rem + 1.6vw, 2.4rem);
+    --naas-title-lg: clamp(2.4rem, 1.6rem + 3.5vw, 4.5rem);
+    --naas-title-xl: clamp(3rem, 1.8rem + 6vw, 7.5rem);
+}

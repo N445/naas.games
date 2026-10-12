@@ -20,7 +20,7 @@ final readonly class ScreenshotStorage
     ) {
     }
 
-    public function store(UploadedFile $upload): StoredImage
+    public function store(UploadedFile $upload, string $hash): StoredImage
     {
         $relativePath = sprintf('%s/%s.%s', date('Y/m'), Uuid::v7(), $upload->guessExtension() ?? 'bin');
         $dimensions = getimagesize($upload->getPathname()) ?: [0, 0];
@@ -31,6 +31,7 @@ final readonly class ScreenshotStorage
             (int) $upload->getSize(),
             $dimensions[0],
             $dimensions[1],
+            $hash,
         );
 
         $upload->move(dirname($this->absolutePathOf($relativePath)), basename($relativePath));

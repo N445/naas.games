@@ -1,0 +1,81 @@
+{% trans_default_domain 'home' %}
+{% set title = settings.heroTitle(locale) ?: 'hero.title'|trans %}
+{% set subtitle = settings.heroSubtitle(locale) ?: 'hero.subtitle'|trans %}
+<script>
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('home-motion');
+    }
+</script>
+<section class="home-hero" aria-labelledby="home-hero-title"
+         data-controller="home-hero"
+         data-home-hero-interval-value="7000"
+         data-home-hero-pause-label-value="{{ 'hero.pause'|trans }}"
+         data-home-hero-play-label-value="{{ 'hero.play'|trans }}">
+    <div class="home-hero__media" data-home-hero-target="media">
+        {% for screenshot in hero %}
+            {% set file = screenshot.file %}
+            {% set hero_width = min(file.width, 2560, (file.width * 1440 / file.height)|round) %}
+            {% set medium_width = min(file.width, 1600, (file.width * 900 / file.height)|round) %}
+            <figure class="home-hero__slide{{ loop.first ? ' is-active' }}" {% if not loop.first %}aria-hidden="true"{% endif %} style="--slide-tint: {{ include('front/home/_tint.html.twig') }}; {{ include('front/_lqip.html.twig', {image: screenshot}) }}"
+                    data-home-hero-target="slide"
+                    data-title="{{ screenshot.title }}"
+                    data-meta="{{ screenshot.game ? screenshot.game.name }}{{ screenshot.game and screenshot.takenAt ? ' · ' }}{{ screenshot.takenAt ? screenshot.takenAt|date(date_format) }}"
+                    data-href="{{ path('APP_GALLERY', {screenshot: screenshot.slug}) }}">
+                <img src="{{ screenshot.path|imagine_filter('front_hero') }}"
+                     srcset="{{ screenshot.path|imagine_filter('front_card') }} {{ min(file.width, 960) }}w, {{ screenshot.path|imagine_filter('front_hero_md') }} {{ medium_width }}w, {{ screenshot.path|imagine_filter('front_hero') }} {{ hero_width }}w"
+                     sizes="100vw" width="{{ file.width }}" height="{{ file.height }}"
+                     alt="{{ screenshot.title }}" decoding="async"
+                     {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
+            </figure>
+        {% endfor %}
+    </div>
+    <div class="home-hero__veil" aria-hidden="true"></div>
+
+    <div class="home-hero__content" data-home-hero-target="content">
+        <p class="home-eyebrow" data-home-hero-target="intro">{{ 'hero.eyebrow'|trans }}</p>
+        <h1 class="home-hero__title" id="home-hero-title" data-home-hero-target="title">{{ title }}</h1>
+        <p class="home-hero__subtitle" data-home-hero-target="intro">{{ subtitle }}</p>
+        <div class="home-hero__actions" data-home-hero-target="intro">
+            <a class="home-button home-button--primary" href="{{ path('APP_GALLERY') }}">
+                {{ 'hero.cta_gallery'|trans }} {{ ux_icon('fa7-solid:arrow-right', {'aria-hidden': 'true'}) }}
+            </a>
+            <a class="home-button home-button--ghost" href="{{ path('APP_LINKS') }}">{{ 'hero.cta_links'|trans }}</a>
+        </div>
+    </div>
+
+    {% if hero is not empty %}
+        {% set first = hero|first %}
+        <div class="home-hero__bar" data-home-hero-target="intro">
+            <a class="home-hero__caption" href="{{ path('APP_GALLERY', {screenshot: first.slug}) }}" data-home-hero-target="caption" aria-live="polite">
+                <span class="home-hero__caption-title" data-home-hero-target="captionTitle">{{ first.title }}</span>
+                <span class="home-hero__caption-meta" data-home-hero-target="captionMeta">{{ first.game ? first.game.name }}{{ first.game and first.takenAt ? ' · ' }}{{ first.takenAt ? first.takenAt|date(date_format) }}</span>
+            </a>
+
+            {% if hero|length > 1 %}
+                <div class="home-hero__controls" role="group" aria-label="{{ 'hero.slides'|trans }}">
+                    <button type="button" class="home-hero__toggle" data-home-hero-target="toggle" data-action="home-hero#toggle" aria-label="{{ 'hero.pause'|trans }}" hidden>
+                        <span class="home-hero__toggle-icon" data-home-hero-target="pauseIcon">{{ ux_icon('fa7-solid:pause', {'aria-hidden': 'true'}) }}</span>
+                        <span class="home-hero__toggle-icon" data-home-hero-target="playIcon" hidden>{{ ux_icon('fa7-solid:play', {'aria-hidden': 'true'}) }}</span>
+                    </button>
+                    <ol class="home-hero__dots">
+                        {% for screenshot in hero %}
+                            <li>
+                                <button type="button" class="home-hero__dot" data-home-hero-target="dot" data-action="home-hero#select" data-home-hero-index-param="{{ loop.index0 }}"
+                                        aria-label="{{ 'hero.slide'|trans({'%number%': loop.index, '%title%': screenshot.title}) }}" {% if loop.first %}aria-current="true"{% endif %}>
+                                    <img class="home-hero__dot-thumb" src="{{ screenshot.path|imagine_filter('screenshot_thumbnail') }}" alt="" width="72" height="45" loading="lazy" decoding="async" style="background: {{ screenshot.palette ? screenshot.palette.colors|first.hex : 'transparent' }}">
+                                    <span class="home-hero__dot-track" aria-hidden="true"><span class="home-hero__dot-progress"></span></span>
+                                </button>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <a class="home-hero__scroll" href="#home-after-hero" data-home-hero-target="intro">
+        <span>{{ 'hero.scroll'|trans }}</span>
+        <span class="home-hero__scroll-line" aria-hidden="true"></span>
+    </a>
+</section>
+<div id="home-after-hero"></div>

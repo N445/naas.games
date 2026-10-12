@@ -10,9 +10,6 @@ liip_imagine:
   default_filter_set_settings:
     format: webp
 
-  webp:
-    generate: true
-
   loaders:
     screenshots:
       filesystem:
@@ -60,3 +57,45 @@ liip_imagine:
       filters:
         auto_rotate: ~
         thumbnail: { size: [1568, 1568], mode: inset }
+    front_hero:
+      data_loader: screenshots
+      quality: 85
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [2560, 1440], mode: inset }
+    front_hero_md:
+      data_loader: screenshots
+      quality: 82
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [1600, 900], mode: inset }
+    front_card:
+      data_loader: screenshots
+      quality: 82
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [960, 9999], mode: inset }
+    front_thumb:
+      data_loader: screenshots
+      quality: 80
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [480, 9999], mode: inset }
+    front_large:
+      data_loader: screenshots
+      quality: 82
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [1600, 9999], mode: inset }
+    front_xl:
+      data_loader: screenshots
+      quality: 80
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [2400, 9999], mode: inset }
+    front_lqip:
+      data_loader: screenshots
+      quality: 50
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [40, 40], mode: inset }

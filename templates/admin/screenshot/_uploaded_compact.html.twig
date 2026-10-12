@@ -1,0 +1,9 @@
+<li class="upload-row {{ duplicate ? 'upload-row--duplicate' }}">
+    <i class="fa {{ duplicate ? 'fa-clone' : 'fa-check' }}" aria-hidden="true"></i>
+    <a href="{{ path('APP_ADMIN_screenshot_edit', {entityId: screenshot.id}) }}" class="upload-row__title">{{ screenshot.title }}</a>
+    {% if duplicate %}
+        <span class="upload-row__note">Déjà dans la photothèque, ignorée</span>
+    {% elseif screenshot.tags is not empty %}
+        <span class="upload-row__note">{{ screenshot.tags|length }} tag(s) digiKam</span>
+    {% endif %}
+</li>

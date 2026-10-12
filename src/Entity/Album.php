@@ -48,7 +48,7 @@ class Album
     /**
      * @var Collection<int, Screenshot>
      */
-    #[ORM\ManyToMany(targetEntity: Screenshot::class, mappedBy: 'albums')]
+    #[ORM\ManyToMany(targetEntity: Screenshot::class, mappedBy: 'albums', fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['takenAt' => \SortDirection::Descending])]
     private Collection $screenshots;
 
@@ -117,7 +117,7 @@ class Album
 
     public function getCover(): ?Screenshot
     {
-        return $this->cover ?? $this->screenshots->first() ?: null;
+        return $this->cover ?? $this->screenshots->slice(0, 1)[0] ?? null;
     }
 
     public function hasCover(Screenshot $screenshot): bool

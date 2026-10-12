@@ -1,0 +1,104 @@
+{% trans_default_domain 'gallery' %}
+<div class="gallery-facets" data-gallery-region="facets">
+    {% for facet in [
+        {key: 'game', title: 'gallery.facets.games', options: facets.games},
+        {key: 'album', title: 'gallery.facets.albums', options: facets.albums},
+    ] %}
+        {% if facet.options is not empty or filters.has(facet.key) %}
+            <section class="gallery-facet" aria-labelledby="gallery-facet-{{ facet.key }}">
+                <h3 class="gallery-facet__title" id="gallery-facet-{{ facet.key }}">{{ facet.title|trans }}</h3>
+                <ul class="gallery-chips">
+                    {% for option in facet.options %}
+                        <li>
+                            <a class="gallery-chip" id="gallery-{{ facet.key }}-{{ option.value }}"
+                               href="{{ path('APP_GALLERY', filters.toggle(facet.key, option.value).toQuery) }}"
+                               {{ filters.is(facet.key, option.value) ? 'aria-current="true"' }}
+                               data-action="gallery-explorer#navigate">
+                                {{ option.label }} <span class="gallery-count">{{ option.count }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+    {% endfor %}
+
+    <section class="gallery-facet" aria-labelledby="gallery-facet-date">
+        <h3 class="gallery-facet__title" id="gallery-facet-date">{{ 'gallery.facets.date'|trans }}</h3>
+        {% if facets.years is not empty %}
+            <ul class="gallery-chips">
+                {% for year in facets.years %}
+                    <li>
+                        <a class="gallery-chip" id="gallery-year-{{ year.year }}"
+                           href="{{ path('APP_GALLERY', filters.toggle('year', year.year).toQuery) }}"
+                           {{ filters.is('year', year.year) ? 'aria-current="true"' }}
+                           data-action="gallery-explorer#navigate">
+                            {{ year.year }} <span class="gallery-count">{{ year.count }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% set selected_year = facets.year(filters.value('year')) %}
+        {% if selected_year %}
+            <ul class="gallery-months" aria-label="{{ 'gallery.facets.months'|trans({'%year%': selected_year.year}) }}">
+                {% for month in 1..12 %}
+                    {% set count = selected_year.monthCount(month) %}
+                    <li>
+                        {% if count > 0 or filters.is('month', month ~ '') %}
+                            <a class="gallery-month" id="gallery-month-{{ month }}"
+                               href="{{ path('APP_GALLERY', filters.toggle('month', month ~ '').toQuery) }}"
+                               title="{{ month|gallery_month }} — {{ count }}"
+                               {{ filters.is('month', month ~ '') ? 'aria-current="true"' }}
+                               data-action="gallery-explorer#navigate">
+                                <span aria-hidden="true">{{ month|gallery_month('LLL')|trim('.') }}</span>
+                                <span class="visually-hidden">{{ month|gallery_month }}, {{ 'gallery.results.count'|trans({'%count%': count}) }}</span>
+                            </a>
+                        {% else %}
+                            <span class="gallery-month" aria-disabled="true"><span aria-hidden="true">{{ month|gallery_month('LLL')|trim('.') }}</span><span class="visually-hidden">{{ month|gallery_month }}, {{ 'gallery.results.count'|trans({'%count%': 0}) }}</span></span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <details class="gallery-range" id="gallery-range" {{ filters.has('from') or filters.has('to') ? 'open' }}>
+            <summary>{{ 'gallery.facets.range'|trans }}</summary>
+            <div class="gallery-range__fields">
+                <label class="gallery-range__field">
+                    <span>{{ 'gallery.facets.from'|trans }}</span>
+                    <input class="gallery-field gallery-field--compact" id="gallery-from" type="date" name="from" form="gallery-form" value="{{ filters.value('from') }}">
+                </label>
+                <label class="gallery-range__field">
+                    <span>{{ 'gallery.facets.to'|trans }}</span>
+                    <input class="gallery-field gallery-field--compact" id="gallery-to" type="date" name="to" form="gallery-form" value="{{ filters.value('to') }}">
+                </label>
+                <button class="gallery-button" type="submit" form="gallery-form" id="gallery-range-apply">{{ 'gallery.facets.apply'|trans }}</button>
+            </div>
+        </details>
+    </section>
+
+    <section class="gallery-facet" aria-labelledby="gallery-facet-color">
+        <h3 class="gallery-facet__title" id="gallery-facet-color">{{ 'gallery.facets.colors'|trans }}</h3>
+        <ul class="gallery-swatches">
+            {% for color in facets.colors %}
+                {% set count = facets.colorCount(color) %}
+                {% set name = ('gallery.colors.' ~ color.value)|trans %}
+                <li>
+                    {% if count > 0 or filters.is('color', color.value) %}
+                        <a class="gallery-swatch" id="gallery-color-{{ color.value }}" style="--swatch: {{ color.swatch }}"
+                           href="{{ path('APP_GALLERY', filters.toggle('color', color.value).toQuery) }}"
+                           title="{{ name }} — {{ count }}"
+                           {{ filters.is('color', color.value) ? 'aria-current="true"' }}
+                           data-action="gallery-explorer#navigate">
+                            <span class="visually-hidden">{{ name }}, {{ 'gallery.results.count'|trans({'%count%': count}) }}</span>
+                        </a>
+                    {% else %}
+                        <span class="gallery-swatch" style="--swatch: {{ color.swatch }}" aria-disabled="true" title="{{ name }} — 0">
+                            <span class="visually-hidden">{{ name }}, {{ 'gallery.results.count'|trans({'%count%': 0}) }}</span>
+                        </span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+</div>

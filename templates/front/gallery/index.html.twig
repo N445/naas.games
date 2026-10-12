@@ -1,0 +1,100 @@
+{% extends 'front/layout.html.twig' %}
+{% trans_default_domain 'gallery' %}
+{% set canonical_query = selected ? {screenshot: selected.slug} : {} %}
+
+{% block title %}{{ selected ? selected.title ~ ' — Naas' : 'gallery.meta.title'|trans }}{% endblock %}
+{% block meta_description %}{{ selected and selected.description ? selected.description|striptags|slice(0, 155) : 'gallery.meta.description'|trans }}{% endblock %}
+
+{% block stylesheets %}{{ parent() }}{{ encore_entry_link_tags('gallery') }}{% endblock %}
+{% block body_class %}front front--gallery{% endblock %}
+
+{% block main %}
+    <div class="gallery" id="gallery"
+         data-controller="gallery-explorer gallery-lightbox"
+         data-gallery-explorer-results-url-value="{{ path('APP_GALLERY_RESULTS') }}"
+         data-gallery-explorer-page-url-value="{{ path('APP_GALLERY') }}"
+         data-gallery-lightbox-detail-url-value="{{ path('APP_GALLERY_SCREENSHOT', {slug: 'screenshot-slug'}) }}"
+         data-gallery-lightbox-view-url-value="{{ path('APP_SCREENSHOT_VIEW', {slug: 'screenshot-slug'}) }}"
+         data-gallery-lightbox-initial-value="{{ selected ? selected.slug : '' }}"
+         data-action="keydown@document->gallery-explorer#shortcut popstate@window->gallery-explorer#restore">
+        <header class="gallery-hero">
+            <p class="gallery-hero__eyebrow" data-gallery-explorer-target="intro">{{ 'gallery.hero.eyebrow'|trans }}</p>
+            <h1 class="gallery-hero__title" data-gallery-explorer-target="intro">{{ 'gallery.hero.title'|trans }}</h1>
+            <p class="gallery-hero__lead" data-gallery-explorer-target="intro">{{ 'gallery.hero.lead'|trans }}</p>
+
+            <form id="gallery-form" class="gallery-search" role="search" action="{{ path('APP_GALLERY') }}" method="get"
+                  data-gallery-explorer-target="form intro"
+                  data-action="submit->gallery-explorer#submit">
+                <label class="visually-hidden" for="gallery-search-input">{{ 'gallery.search.label'|trans }}</label>
+                <span class="gallery-search__icon fa-solid fa-magnifying-glass" aria-hidden="true"></span>
+                <input id="gallery-search-input" class="gallery-search__input" type="search" name="q"
+                       value="{{ filters.value('q') }}" maxlength="100" autocomplete="off" enterkeyhint="search"
+                       placeholder="{{ 'gallery.search.placeholder'|trans }}"
+                       aria-describedby="gallery-search-shortcut"
+                       data-gallery-explorer-target="search"
+                       data-action="input->gallery-explorer#search keydown.esc->gallery-explorer#clearSearch">
+                <kbd class="gallery-search__shortcut" id="gallery-search-shortcut" title="{{ 'gallery.search.shortcut'|trans }}"><span aria-hidden="true">/</span><span class="visually-hidden">{{ 'gallery.search.shortcut'|trans }}</span></kbd>
+                {% for key in ['album', 'tag', 'game', 'color', 'year', 'month'] %}
+                    <input type="hidden" name="{{ key }}" value="{{ filters.value(key) }}">
+                {% endfor %}
+            </form>
+        </header>
+
+        <div class="gallery-layout">
+            <aside class="gallery-filters" id="gallery-filters" aria-labelledby="gallery-filters-title"
+                   data-gallery-explorer-target="drawer" data-lenis-prevent
+                   data-action="keydown->gallery-explorer#trapDrawer">
+                <div class="gallery-filters__header">
+                    <h2 class="gallery-filters__title" id="gallery-filters-title">{{ 'gallery.filters.title'|trans }}</h2>
+                    <button type="button" class="gallery-icon-button gallery-filters__close" data-action="gallery-explorer#closeDrawer">
+                        <span class="fa-solid fa-xmark" aria-hidden="true"></span>
+                        <span class="visually-hidden">{{ 'gallery.filters.close'|trans }}</span>
+                    </button>
+                </div>
+                <div class="gallery-filters__body">
+                    {{ include('front/gallery/_facets.html.twig') }}
+                    <section class="gallery-facet" aria-labelledby="gallery-facet-tags" data-controller="gallery-tag-tree">
+                        <h3 class="gallery-facet__title" id="gallery-facet-tags">{{ 'gallery.facets.tags'|trans }}</h3>
+                        <label class="visually-hidden" for="gallery-tag-search">{{ 'gallery.facets.tag_search'|trans }}</label>
+                        <input id="gallery-tag-search" class="gallery-field gallery-field--compact" type="search" autocomplete="off"
+                               placeholder="{{ 'gallery.facets.tag_search_placeholder'|trans }}"
+                               data-gallery-tag-tree-target="query" data-action="input->gallery-tag-tree#filter">
+                        {{ include('front/gallery/_tags.html.twig') }}
+                    </section>
+                </div>
+                <div class="gallery-filters__footer">
+                    <button type="button" class="gallery-button gallery-button--primary gallery-button--block" data-action="gallery-explorer#closeDrawer" data-gallery-explorer-target="drawerSubmit">
+                        {{ 'gallery.filters.show_results'|trans({'%count%': page.total}) }}
+                    </button>
+                </div>
+            </aside>
+            <div class="gallery-backdrop" data-gallery-explorer-target="backdrop" data-action="click->gallery-explorer#closeDrawer" hidden></div>
+
+            <section class="gallery-results" aria-labelledby="gallery-results-title" data-gallery-explorer-target="results">
+                <h2 class="visually-hidden" id="gallery-results-title" tabindex="-1" data-gallery-explorer-target="heading">{{ 'gallery.results.title'|trans }}</h2>
+                <div class="gallery-toolbar">
+                    <button type="button" class="gallery-button gallery-toolbar__filters" aria-controls="gallery-filters" aria-expanded="false"
+                            data-gallery-explorer-target="drawerToggle" data-action="gallery-explorer#openDrawer">
+                        <span class="fa-solid fa-sliders" aria-hidden="true"></span>
+                        {{ 'gallery.filters.open'|trans }}
+                    </button>
+                    <div class="gallery-toolbar__sort">
+                        <label for="gallery-sort">{{ 'gallery.sort.label'|trans }}</label>
+                        <select id="gallery-sort" name="sort" form="gallery-form" class="gallery-field gallery-field--select"
+                                data-gallery-explorer-target="sort" data-action="change->gallery-explorer#submit">
+                            {% for sort in enum('App\\Gallery\\GallerySort').cases() %}
+                                <option value="{{ sort.value }}" {{ filters.sort == sort ? 'selected' }}>{{ ('gallery.sort.' ~ sort.value)|trans }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                {{ include('front/gallery/_summary.html.twig') }}
+                <p class="visually-hidden" role="status" data-gallery-explorer-target="status" data-error="{{ 'gallery.results.error'|trans }}"></p>
+                <div class="gallery-progress" data-gallery-explorer-target="progress" aria-hidden="true"></div>
+                {{ include('front/gallery/_results.html.twig') }}
+            </section>
+        </div>
+
+        {{ include('front/gallery/_lightbox.html.twig') }}
+    </div>
+{% endblock %}

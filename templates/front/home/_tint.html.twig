@@ -1,0 +1,2 @@
+{%- set palette = screenshot.palette -%}
+{{- palette and palette.colors is not empty ? (palette.colors|first).hex : '#0e1016' -}}

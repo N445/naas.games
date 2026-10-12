@@ -1,0 +1,16 @@
+{% trans_default_domain 'home' %}
+<section class="home-statement" aria-labelledby="home-statement-label">
+    <div class="home-container">
+        <p class="home-eyebrow" id="home-statement-label">{{ 'statement.label'|trans }}</p>
+        <p class="home-statement__text" data-controller="home-statement">{{ 'statement.text'|trans }}</p>
+
+        <dl class="home-stats" aria-label="{{ 'statistics.label'|trans }}" data-controller="home-counter">
+            {% for key, value in statistics %}
+                <div class="home-stats__item">
+                    <dt class="home-stats__label">{{ ('statistics.' ~ key)|trans({'%count%': value}) }}</dt>
+                    <dd class="home-stats__value" data-home-counter-target="value" data-value="{{ value }}">{{ value|number_format(0, '.', number_separator) }}</dd>
+                </div>
+            {% endfor %}
+        </dl>
+    </div>
+</section>

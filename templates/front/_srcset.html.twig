@@ -1,0 +1,10 @@
+{%- set steps = {front_thumb: 480, front_card: 960, front_large: 1600, front_xl: 2400} -%}
+{%- set candidates = [] -%}
+{%- for filter, width in steps -%}
+    {%- if candidates is empty or width <= image.file.width or candidates|last.width < image.file.width -%}
+        {%- set candidates = candidates|merge([{filter: filter, width: min(width, image.file.width)}]) -%}
+    {%- endif -%}
+{%- endfor -%}
+{%- for candidate in candidates|filter(candidate => candidate.width > 0) -%}
+    {{ image.path|imagine_filter(candidate.filter) }} {{ candidate.width }}w{{ not loop.last ? ', ' }}
+{%- endfor -%}

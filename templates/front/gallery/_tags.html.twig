@@ -1,0 +1,43 @@
+{% trans_default_domain 'gallery' %}
+{% macro branch(nodes, filters, depth) %}
+    {% trans_default_domain 'gallery' %}
+    <ul class="tag-tree{{ depth > 0 ? ' tag-tree--nested' }}">
+        {% for node in nodes %}
+            {% set active = filters.is('tag', node.slug) %}
+            <li class="tag-tree__item" data-gallery-tag-tree-target="item" data-name="{{ node.name|lower }}" data-tag-id="{{ node.id }}">
+                <div class="tag-tree__row">
+                    {% if node.hasChildren %}
+                        <button type="button" class="tag-tree__toggle" id="tag-toggle-{{ node.id }}"
+                                aria-controls="tag-branch-{{ node.id }}"
+                                aria-expanded="{{ active or node.leadsTo(filters.value('tag')) ? 'true' : 'false' }}"
+                                data-action="gallery-tag-tree#toggle">
+                            <span class="fa-solid fa-chevron-right" aria-hidden="true"></span>
+                            <span class="visually-hidden">{{ 'gallery.facets.tag_expand'|trans({'%name%': node.displayName}) }}</span>
+                        </button>
+                    {% else %}
+                        <span class="tag-tree__spacer" aria-hidden="true"></span>
+                    {% endif %}
+                    <a class="tag-tree__link" id="tag-link-{{ node.id }}"
+                       href="{{ path('APP_GALLERY', filters.toggle('tag', node.slug).toQuery) }}"
+                       {{ active ? 'aria-current="true"' }}
+                       data-action="gallery-explorer#navigate">
+                        <span class="tag-tree__name">{{ node.displayName }}</span>
+                        <span class="gallery-count">{{ node.count }}</span>
+                    </a>
+                </div>
+                {% if node.hasChildren %}
+                    <div class="tag-tree__branch{{ not (active or node.leadsTo(filters.value('tag'))) ? ' is-collapsed' }}" id="tag-branch-{{ node.id }}">
+                        {{ _self.branch(node.children, filters, depth + 1) }}
+                    </div>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+<div class="gallery-tags" data-gallery-region="tags">
+    {% if facets.tags is not empty %}
+        {{ _self.branch(facets.tags, filters, 0) }}
+    {% else %}
+        <p class="gallery-facet__empty">{{ 'gallery.facets.no_tags'|trans }}</p>
+    {% endif %}
+</div>

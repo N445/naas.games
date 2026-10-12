@@ -1,0 +1,18 @@
+<footer {{ attributes.defaults({class: 'site-footer'}) }}>
+    <div class="site-footer__inner">
+        <div class="site-footer__brand">
+            <strong>Naas</strong>
+            <span>{{ 'layout.footer.tagline'|trans }}</span>
+        </div>
+        <ul class="site-footer__links">
+            {% for link in this.links %}
+                <li>
+                    <a href="{{ link.url }}" target="_blank" rel="noopener" style="--link-color: {{ link.color }}" aria-label="{{ link.title }}" title="{{ link.title }}">
+                        {{ ux_icon(link.icon) }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="site-footer__legal">© {{ 'now'|date('Y') }} Naas · {{ 'layout.footer.rights'|trans }}</p>
+    </div>
+</footer>

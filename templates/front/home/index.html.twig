@@ -1,0 +1,58 @@
+{% extends 'front/layout.html.twig' %}
+{% trans_default_domain 'home' %}
+
+{% block title %}{{ 'meta.title'|trans }}{% endblock %}
+{% block meta_description %}{{ 'meta.description'|trans }}{% endblock %}
+{% block share_image %}{{ hero is not empty ? hero|first.path|imagine_filter('front_hero_md') : absolute_url(asset('favicon/web-app-manifest-512x512.png')) }}{% endblock %}
+
+{% block structured_data %}
+    {% set website = {
+        '@type': 'WebSite',
+        '@id': url('APP_HOMEPAGE') ~ '#website',
+        name: 'Naas',
+        url: url('APP_HOMEPAGE'),
+        inLanguage: app.request.locale,
+        description: 'meta.description'|trans,
+        publisher: {'@id': url('APP_HOMEPAGE', {_locale: 'en'}) ~ '#naas'},
+        potentialAction: {
+            '@type': 'SearchAction',
+            target: {'@type': 'EntryPoint', urlTemplate: url('APP_GALLERY') ~ '?q={search_term_string}'},
+            'query-input': 'required name=search_term_string',
+        },
+    } %}
+    {% set person = {
+        '@type': 'Person',
+        '@id': url('APP_HOMEPAGE', {_locale: 'en'}) ~ '#naas',
+        name: 'Naas',
+        url: url('APP_HOMEPAGE', {_locale: 'en'}),
+        image: absolute_url(asset('images/naas-logo.png')),
+        sameAs: social_urls,
+    } %}
+    <script type="application/ld+json">{{ {'@context': 'https://schema.org', '@graph': [website, person]}|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
+{% endblock %}
+
+{% block stylesheets %}{{ parent() }}{{ encore_entry_link_tags('home') }}{% endblock %}
+{% block body_class %}{{ parent() }} front--home{% endblock %}
+
+{% block main %}
+    {% set locale = app.request.locale %}
+    {% set number_separator = locale == 'fr' ? ' ' : ',' %}
+    {% set date_format = locale == 'fr' ? 'd/m/Y' : 'M j, Y' %}
+
+    {{ include('front/home/_hero.html.twig') }}
+
+    {% if statistics is not empty %}
+        {{ include('front/home/_statement.html.twig') }}
+    {% endif %}
+
+    {% if latest is not empty %}
+        {{ include('front/home/_latest.html.twig') }}
+    {% endif %}
+
+    {% if albums is not empty %}
+        {{ include('front/home/_albums.html.twig') }}
+    {% endif %}
+
+
+    {{ include('front/home/_cta.html.twig', {marquee: latest is empty ? hero : latest}) }}
+{% endblock %}

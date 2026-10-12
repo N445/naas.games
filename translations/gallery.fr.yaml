@@ -1,0 +1,85 @@
+gallery:
+    meta:
+        title: Galerie — Naas
+        description: Parcourez toutes les captures Star Citizen et Arc Raiders de Naas. Filtrez par jeu, album, tag, date ou couleur.
+    hero:
+        eyebrow: Explorateur
+        title: La galerie
+        lead: Toutes les captures du 'verse et d'ailleurs. Cherchez, filtrez, plongez dans les détails.
+    search:
+        label: Rechercher des captures
+        placeholder: Un vaisseau, un lieu, un tag…
+        shortcut: Appuyez sur / pour rechercher
+        clear: Effacer la recherche
+    filters:
+        title: Filtres
+        open: Filtres
+        close: Fermer les filtres
+        show_results: '{0} Aucun résultat|{1} Voir 1 résultat|]1,Inf[ Voir %count% résultats'
+        active: Filtres actifs
+        clear_all: Tout effacer
+        remove: 'Retirer le filtre : %label%'
+    facets:
+        games: Jeu
+        albums: Albums
+        date: Date de prise
+        months: 'Mois de %year%'
+        range: Période personnalisée
+        from: Du
+        to: Au
+        apply: Appliquer
+        colors: Couleur dominante
+        tags: Tags
+        tag_search: Rechercher un tag
+        tag_search_placeholder: Filtrer les tags…
+        tag_expand: 'Afficher les tags sous %name%'
+        no_tags: Aucun tag pour ces résultats.
+        no_options: Rien à filtrer pour l'instant.
+    colors:
+        red: Rouge
+        orange: Orange
+        yellow: Jaune
+        green: Vert
+        cyan: Cyan
+        blue: Bleu
+        purple: Violet
+        pink: Rose
+        neutral: Neutre
+    sort:
+        label: Trier par
+        taken: Prises récemment
+        uploaded: Ajoutées récemment
+        views: Les plus vues
+        downloads: Les plus téléchargées
+    pill:
+        q: 'Recherche : « %value% »'
+        year: '%value%'
+        month: '%value%'
+        from: 'Depuis le %value%'
+        to: 'Jusqu''au %value%'
+        color: 'Couleur : %value%'
+    results:
+        title: Résultats
+        count: '{0} Aucune capture|{1} 1 capture|]1,Inf[ %count% captures'
+        status: '{0} Aucune capture ne correspond à ces filtres.|{1} 1 capture trouvée.|]1,Inf[ %count% captures trouvées.'
+        empty_title: Rien dans ce secteur
+        empty_text: Aucune capture ne correspond à ces filtres. Retirez-en un ou repartez de zéro.
+        load_more: Voir plus
+        loading: Chargement…
+        error: Le chargement a échoué. Merci de réessayer.
+    lightbox:
+        label: Détails de la capture
+        close: Fermer
+        previous: Capture précédente
+        next: Capture suivante
+        taken: Prise le %date%
+        views: '{0} Aucune vue|{1} 1 vue|]1,Inf[ %count% vues'
+        downloads: '{0} Aucun téléchargement|{1} 1 téléchargement|]1,Inf[ %count% téléchargements'
+        download: Télécharger
+        albums: Albums
+        tags: Tags
+        palette: Palette
+        palette_filter: 'Filtrer par couleur : %color%'
+        similar: Captures similaires
+        loading: Chargement de la capture…
+        keyboard: ← et → pour naviguer, Échap pour fermer.

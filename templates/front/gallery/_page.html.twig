@@ -1,0 +1,6 @@
+<ul data-gallery-page>
+    {% for screenshot in page %}
+        {{ include('front/gallery/_card.html.twig', {eager: false}) }}
+    {% endfor %}
+</ul>
+{{ include('front/gallery/_more.html.twig') }}

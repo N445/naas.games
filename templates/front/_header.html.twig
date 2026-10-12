@@ -1,0 +1,21 @@
+{% set current = app.request.attributes.get('_route') %}
+<header class="site-header" data-controller="site-header">
+    <div class="site-header__inner">
+        <a href="{{ path('APP_HOMEPAGE') }}" class="site-header__brand" aria-label="{{ 'layout.home'|trans }}">
+            <img src="{{ 'images/naas-logo.png'|imagine_filter('main_logo') }}" alt="" width="36" height="36">
+            <span>Naas</span>
+        </a>
+
+        <nav class="site-nav" aria-label="{{ 'layout.main_navigation'|trans }}">
+            {% for item in [
+                {route: 'APP_HOMEPAGE', label: 'layout.nav.home'},
+                {route: 'APP_GALLERY', label: 'layout.nav.gallery'},
+                {route: 'APP_LINKS', label: 'layout.nav.links'},
+            ] %}
+                <a href="{{ path(item.route) }}" class="site-nav__link" {% if current == item.route %}aria-current="page"{% endif %}>{{ item.label|trans }}</a>
+            {% endfor %}
+        </nav>
+
+        {{ include('front/_locale_switcher.html.twig') }}
+    </div>
+</header>

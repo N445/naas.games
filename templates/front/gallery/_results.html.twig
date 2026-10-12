@@ -1,0 +1,20 @@
+{% trans_default_domain 'gallery' %}
+<div class="gallery-results__body" data-gallery-region="results">
+    {% if page|length > 0 %}
+        <ul class="gallery-grid" data-gallery-explorer-target="grid">
+            {% for screenshot in page %}
+                {{ include('front/gallery/_card.html.twig', {eager: page.number == 1 and loop.index <= 6}) }}
+            {% endfor %}
+        </ul>
+        {{ include('front/gallery/_more.html.twig') }}
+    {% else %}
+        <div class="gallery-empty">
+            <span class="gallery-empty__icon fa-solid fa-satellite" aria-hidden="true"></span>
+            <h3 class="gallery-empty__title">{{ 'gallery.results.empty_title'|trans }}</h3>
+            <p class="gallery-empty__text">{{ 'gallery.results.empty_text'|trans }}</p>
+            {% if not filters.empty %}
+                <a class="gallery-button gallery-button--primary" id="gallery-empty-clear" href="{{ path('APP_GALLERY', filters.cleared.toQuery) }}" data-action="gallery-explorer#navigate">{{ 'gallery.filters.clear_all'|trans }}</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>

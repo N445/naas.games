@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Ai\TagScreenshot;
+use App\Controller\Admin\Filter\ClassificationFilter;
+use App\Controller\Admin\Filter\TagTreeFilter;
 use App\Entity\Album;
 use App\Entity\Screenshot;
 use App\Repository\AlbumRepository;
@@ -11,6 +13,7 @@ use App\Screenshot\ScreenshotStorage;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Asset;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
@@ -25,6 +28,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\NumericFilter;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,7 +77,11 @@ final class ScreenshotCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield Field::new('path', 'Aperçu')->setTemplatePath('admin/field/screenshot_thumbnail.html.twig')->onlyOnIndex()->setSortable(false);
+        yield Field::new('path', 'Aperçu')
+            ->setTemplatePath('admin/field/screenshot_thumbnail.html.twig')
+            ->addJsFiles(Asset::fromEasyAdminAssetPackage('field-image.js'))
+            ->onlyOnIndex()
+            ->setSortable(false);
 
         yield FormField::addFieldset('Informations');
         yield TextField::new('title', 'Titre');
@@ -101,14 +112,15 @@ final class ScreenshotCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add('game')
-            ->add('albums')
-            ->add('tags')
-            ->add('published')
-            ->add('takenAt')
-            ->add('createdAt')
-            ->add('viewCount')
-            ->add('downloadCount');
+            ->add(ClassificationFilter::new())
+            ->add(EntityFilter::new('game', 'Jeu'))
+            ->add(EntityFilter::new('albums', 'Album'))
+            ->add(TagTreeFilter::new())
+            ->add(BooleanFilter::new('published', 'Publié'))
+            ->add(DateTimeFilter::new('takenAt', 'Prise le'))
+            ->add(DateTimeFilter::new('createdAt', 'Importée le'))
+            ->add(NumericFilter::new('viewCount', 'Vues'))
+            ->add(NumericFilter::new('downloadCount', 'Téléchargements'));
     }
 
     public function configureActions(Actions $actions): Actions
@@ -127,6 +139,7 @@ final class ScreenshotCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->add(Crud::PAGE_DETAIL, $original)
             ->add(Crud::PAGE_EDIT, $original)
+            ->add(Crud::PAGE_EDIT, Action::DELETE)
             ->addBatchAction(Action::new('addToAlbum', 'Ajouter à un album', 'fa fa-book-open')->linkToCrudAction('addToAlbum'))
             ->addBatchAction(Action::new('publish', 'Publier', 'fa fa-eye')->linkToCrudAction('publish'))
             ->addBatchAction(Action::new('unpublish', 'Dépublier', 'fa fa-eye-slash')->linkToCrudAction('unpublish'))

@@ -1,0 +1,52 @@
+{% trans_default_domain 'home' %}
+<section class="home-latest" aria-labelledby="home-latest-title" data-controller="home-strip">
+    <div class="home-latest__pin" data-home-strip-target="pin">
+        <header class="home-container home-heading" data-controller="home-reveal">
+            <div>
+                <p class="home-eyebrow" data-home-reveal-target="item">{{ 'latest.eyebrow'|trans }}</p>
+                <h2 class="home-heading__title" id="home-latest-title" data-home-reveal-target="item">{{ 'latest.title'|trans }}</h2>
+            </div>
+            <a class="home-link" href="{{ path('APP_GALLERY') }}" data-home-reveal-target="item">
+                {{ 'latest.all'|trans }} {{ ux_icon('fa7-solid:arrow-right', {'aria-hidden': 'true'}) }}
+            </a>
+        </header>
+
+        <div class="home-latest__viewport" data-home-strip-target="viewport" data-action="focusin->home-strip#follow">
+            <ol class="home-latest__track" data-home-strip-target="track">
+                {% for screenshot in latest %}
+                    {% set file = screenshot.file %}
+                    <li class="home-latest__item" style="--shot-ratio: {{ file.width }} / {{ file.height }}; --shot-tint: {{ include('front/home/_tint.html.twig') }}">
+                        <a class="home-shot" href="{{ path('APP_GALLERY', {screenshot: screenshot.slug}) }}">
+                            <span class="home-shot__frame" style="{{ include('front/_lqip.html.twig', {image: screenshot}) }}">
+                                <img src="{{ screenshot.path|imagine_filter('front_card') }}"
+                                     srcset="{{ include('front/_srcset.html.twig', {image: screenshot}) }}"
+                                     sizes="(min-width: 900px) 60vw, 95vw" width="{{ file.width }}" height="{{ file.height }}"
+                                     alt="{{ screenshot.title }}" loading="lazy" decoding="async" data-home-strip-target="image">
+                            </span>
+                            <span class="home-shot__meta">
+                                <span class="home-shot__index" aria-hidden="true">{{ '%02d'|format(loop.index) }}</span>
+                                <span class="home-shot__text">
+                                    <span class="home-shot__title">{{ screenshot.title }}</span>
+                                    {% if screenshot.game or screenshot.takenAt %}
+                                        <span class="home-shot__info">{{ screenshot.game ? screenshot.game.name }}{{ screenshot.game and screenshot.takenAt ? ' · ' }}{{ screenshot.takenAt ? screenshot.takenAt|date(date_format) }}</span>
+                                    {% endif %}
+                                </span>
+                            </span>
+                        </a>
+                    </li>
+                {% endfor %}
+                <li class="home-latest__item home-latest__item--more">
+                    <a class="home-latest__more" href="{{ path('APP_GALLERY') }}">
+                        <span class="home-latest__more-icon" aria-hidden="true">{{ ux_icon('fa7-solid:arrow-right') }}</span>
+                        {{ 'latest.all'|trans }}
+                    </a>
+                </li>
+            </ol>
+        </div>
+
+        <div class="home-container home-latest__footer" aria-hidden="true">
+            <span class="home-latest__hint">{{ 'latest.drag'|trans }}</span>
+            <span class="home-latest__progress"><span data-home-strip-target="progress"></span></span>
+        </div>
+    </div>
+</section>

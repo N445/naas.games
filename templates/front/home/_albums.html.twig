@@ -1,0 +1,41 @@
+{% trans_default_domain 'home' %}
+<section class="home-albums" aria-labelledby="home-albums-title" data-controller="home-reveal">
+    <header class="home-container home-heading">
+        <div>
+            <p class="home-eyebrow" data-home-reveal-target="item">{{ 'albums.eyebrow'|trans }}</p>
+            <h2 class="home-heading__title" id="home-albums-title" data-home-reveal-target="item">{{ 'albums.title'|trans }}</h2>
+        </div>
+        <a class="home-link" href="{{ path('APP_GALLERY') }}" data-home-reveal-target="item">
+            {{ 'albums.all'|trans }} {{ ux_icon('fa7-solid:arrow-right', {'aria-hidden': 'true'}) }}
+        </a>
+    </header>
+
+    <ul class="home-container home-albums__grid">
+        {% for highlight in albums %}
+            {% set album = highlight.album %}
+            {% set cover = highlight.cover %}
+            <li class="home-album" data-home-reveal-target="item">
+                <a class="home-album__link" href="{{ path('APP_GALLERY', {album: album.slug}) }}">
+                    <span class="home-album__media" {% if cover %}style="--album-tint: {{ include('front/home/_tint.html.twig', {screenshot: cover}) }}; {{ include('front/_lqip.html.twig', {image: cover}) }}"{% endif %}>
+                        {% if cover %}
+                            <img src="{{ cover.path|imagine_filter('front_card') }}" width="{{ cover.file.width }}" height="{{ cover.file.height }}"
+                                 srcset="{{ include('front/_srcset.html.twig', {image: cover}) }}"
+                                 sizes="{{ loop.first and albums|length is odd ? '(min-width: 900px) 95vw, 100vw' : '(min-width: 900px) 55vw, 100vw' }}"
+                                 alt="" loading="lazy" decoding="async" data-home-reveal-target="parallax">
+                        {% else %}
+                            <span class="home-album__placeholder" aria-hidden="true">{{ ux_icon('fa7-solid:images') }}</span>
+                        {% endif %}
+                    </span>
+                    <span class="home-album__body">
+                        <span class="home-album__index" aria-hidden="true">{{ '%02d'|format(loop.index) }}</span>
+                        <span class="home-album__text">
+                            <span class="home-album__title">{{ album.title }}</span>
+                            <span class="home-album__count">{{ 'albums.count'|trans({'%count%': highlight.screenshotCount}) }}</span>
+                        </span>
+                        <span class="home-album__arrow" aria-hidden="true">{{ ux_icon('fa7-solid:arrow-right') }}</span>
+                    </span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</section>
