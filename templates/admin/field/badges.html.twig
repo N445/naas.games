@@ -1,0 +1,7 @@
+{% for item in field.value %}
+    <twig:ea:Badge variant="outline" radius="full" title="{{ item }}">
+        {%- if item.ancestors is defined %}{{ include('admin/_tag_label.html.twig', {tag: item}) }}{% else %}{{ item }}{% endif -%}
+    </twig:ea:Badge>
+{% else %}
+    <span class="text-muted">—</span>
+{% endfor %}

@@ -1,0 +1,18 @@
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block main %}
+    {% set screenshot = entity.instance %}
+    <div class="screenshot-detail">
+        <a class="screenshot-detail__preview" href="{{ path('APP_ADMIN_screenshot_original', {id: screenshot.id}) }}" target="_blank">
+            <img src="{{ screenshot.path|imagine_filter('screenshot_preview') }}" alt="{{ screenshot.title }}">
+            <span class="screenshot-detail__meta">
+                {{ screenshot.file.dimensions }} · {{ screenshot.file.size|file_size }} ·
+                <i class="fa fa-eye"></i> {{ screenshot.viewCount }} · <i class="fa fa-download"></i> {{ screenshot.downloadCount }}
+            </span>
+        </a>
+        <div class="screenshot-detail__fields">
+            {{ include('admin/_palette.html.twig', {palette: screenshot.palette, legend: true}) }}
+            {{ parent() }}
+        </div>
+    </div>
+{% endblock %}

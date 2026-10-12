@@ -1,0 +1,55 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Importer des screenshots{% endblock %}
+
+{% block main %}
+    <div class="screenshot-upload"
+         data-controller="screenshot-upload"
+         data-screenshot-upload-upload-url-value="{{ path('APP_ADMIN_screenshot_upload_file') }}"
+         data-screenshot-upload-album-url-value="{{ path('APP_ADMIN_screenshot_upload_album') }}"
+         data-screenshot-upload-csrf-token-value="{{ csrf_token(csrfTokenId) }}">
+
+        <div class="screenshot-upload__options">
+            <label class="form-label" for="upload-game">Jeu</label>
+            <select id="upload-game" class="form-select" data-controller="tom-select" data-screenshot-upload-target="game">
+                <option value="">Détection automatique par l'IA</option>
+                {% for game in games %}
+                    <option value="{{ game.id }}">{{ game.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label class="form-label mt-3" for="upload-album">Ajouter à l'album</label>
+            <div class="screenshot-upload__album">
+                <select id="upload-album" class="form-select" data-controller="tom-select" data-screenshot-upload-target="album" data-action="change->screenshot-upload#toggleNewAlbum">
+                    <option value="">Aucun album</option>
+                    {% for album in albums %}
+                        <option value="{{ album.id }}" {{ album.id == selectedAlbum ? 'selected' }}>{{ album.title }}</option>
+                    {% endfor %}
+                    <option value="new">+ Nouvel album…</option>
+                </select>
+                <input type="text" class="form-control" placeholder="Titre du nouvel album" hidden
+                       data-screenshot-upload-target="newAlbum">
+            </div>
+        </div>
+
+        <label class="dropzone" data-screenshot-upload-target="dropzone"
+               data-action="dragenter->screenshot-upload#highlight dragover->screenshot-upload#highlight dragleave->screenshot-upload#unhighlight drop->screenshot-upload#drop">
+            <i class="fa fa-cloud-arrow-up dropzone__icon"></i>
+            <span class="dropzone__title">Glissez vos screenshots ici</span>
+            <span class="dropzone__hint">ou cliquez pour les sélectionner · JPG, PNG, WebP, GIF</span>
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden
+                   data-screenshot-upload-target="input" data-action="screenshot-upload#select">
+        </label>
+
+        <div class="upload-summary" data-screenshot-upload-target="summary" hidden>
+            <div class="progress" role="progressbar" aria-label="Progression de l'import">
+                <div class="progress-bar" data-screenshot-upload-target="progress" style="width: 0%"></div>
+            </div>
+            <span data-screenshot-upload-target="status"></span>
+        </div>
+
+        <ul class="upload-errors" data-screenshot-upload-target="errors"></ul>
+
+        <div class="screenshot-grid screenshot-grid--editable" data-screenshot-upload-target="results"></div>
+    </div>
+{% endblock %}

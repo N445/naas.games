@@ -1,0 +1,6 @@
+{% extends '@EasyAdmin/crud/detail.html.twig' %}
+
+{% block main %}
+    {{ parent() }}
+    <twig:Admin:AlbumScreenshots album="{{ entity.instance }}" />
+{% endblock %}

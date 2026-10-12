@@ -1,0 +1,11 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Tags{% endblock %}
+
+{% block page_actions %}
+    <twig:ea:Button htmlElement="a" href="{{ path('APP_ADMIN_tag_index') }}" icon="fa fa-list">Vue liste</twig:ea:Button>
+{% endblock %}
+
+{% block main %}
+    <twig:Admin:TagTreeManager />
+{% endblock %}

@@ -1,0 +1,20 @@
+{% if palette %}
+    {% set score = palette.balanceScore %}
+    <div class="palette {{ legend|default(false) ? 'palette--detailed' }}">
+        <div class="palette__bar" role="img" aria-label="Couleurs prédominantes : {% for color in palette.colors %}{{ color.hex }} {{ color.share }} %{{ not loop.last ? ', ' }}{% endfor %}">
+            {% for color in palette.colors %}
+                <span class="palette__segment" style="flex-basis: {{ color.share }}%; background: {{ color.hex }}" title="{{ color.hex }} · {{ color.share }} %"></span>
+            {% endfor %}
+        </div>
+        {% if legend|default(false) %}
+            <ul class="palette__legend">
+                {% for color in palette.colors %}
+                    <li><span class="palette__swatch" style="background: {{ color.hex }}"></span><code>{{ color.hex }}</code> {{ color.share }} %</li>
+                {% endfor %}
+            </ul>
+            <span class="palette__score palette__score--{{ score >= 75 ? 'good' : (score >= 50 ? 'fair' : 'poor') }}" title="Proximité avec la règle 60/30/10 : couleur dominante 60 %, secondaire 30 %, accent 10 %">
+                Équilibre 60/30/10 : {{ score }} %
+            </span>
+        {% endif %}
+    </div>
+{% endif %}

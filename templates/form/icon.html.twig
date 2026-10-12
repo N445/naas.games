@@ -1,0 +1,47 @@
+{% block icon_widget %}
+    {% set sets = form.vars.sets %}
+    {% set attr = attr|merge({
+        placeholder: attr.placeholder|default('fa7-brands:discord'),
+        autocomplete: 'off',
+        'data-form--icon-target': 'value',
+        'data-action': 'input->form--icon#renderPreview',
+    }) %}
+
+    <div class="icon-picker"
+         data-controller="form--icon"
+         data-form--icon-sets-value="{{ sets|keys|json_encode }}"
+         data-form--icon-search-url-value="{{ path('APP_ADMIN_icon_picker_search') }}"
+         data-form--icon-svg-url-value="{{ path('APP_ADMIN_icon_picker_svg') }}"
+         data-action="click@window->form--icon#closeOnOutsideClick keydown.esc->form--icon#close">
+        <div class="input-group">
+            <span class="input-group-text" aria-hidden="true">
+                <i class="icon-picker__preview is-empty" data-form--icon-target="preview"></i>
+            </span>
+
+            {{ block('form_widget_simple') }}
+
+            <button type="button" class="btn btn-secondary" aria-expanded="false" data-form--icon-target="toggle" data-action="form--icon#toggle">
+                Parcourir
+            </button>
+        </div>
+
+        <div class="icon-picker__panel" data-form--icon-target="panel" hidden>
+            <div class="icon-picker__filters">
+                {% if sets|length > 1 %}
+                    <select class="form-select" aria-label="Collection" data-controller="tom-select" data-form--icon-target="set" data-action="change->form--icon#search">
+                        <option value="{{ sets|keys|join(',') }}">Toutes les collections</option>
+                        {% for prefix, label in sets %}
+                            <option value="{{ prefix }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+
+                <input type="search" class="form-control" placeholder="Rechercher en anglais (discord, rocket, star…)" aria-label="Rechercher une icône" autocomplete="off"
+                       data-form--icon-target="query" data-action="input->form--icon#search keydown.enter->form--icon#preventSubmit">
+            </div>
+
+            <div class="icon-picker__grid" data-form--icon-target="grid"></div>
+            <p class="icon-picker__status" data-form--icon-target="status"></p>
+        </div>
+    </div>
+{% endblock icon_widget %}

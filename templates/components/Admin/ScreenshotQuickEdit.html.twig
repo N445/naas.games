@@ -1,0 +1,63 @@
+<article {{ attributes.defaults({class: 'quick-edit'}) }} {% if computed.awaitingAi %}data-poll="delay(4000)|$render"{% endif %}>
+    <a class="quick-edit__image" href="{{ path('APP_ADMIN_screenshot_edit', {entityId: screenshot.id}) }}" title="Ouvrir la fiche complète">
+        <img src="{{ screenshot.path|imagine_filter('screenshot_thumbnail') }}" alt="">
+        <span class="quick-edit__state" data-loading="addClass(is-visible)">
+            <i class="fa fa-spinner fa-spin"></i>
+        </span>
+        {% if saved %}<span class="quick-edit__state is-visible quick-edit__state--saved" data-loading="hide"><i class="fa fa-check"></i></span>{% endif %}
+    </a>
+
+    {{ include('admin/_palette.html.twig', {palette: screenshot.palette}) }}
+
+    <div class="quick-edit__body">
+        <input type="text" class="form-control form-control-sm {{ _errors.has('screenshot.title') ? 'is-invalid' }}"
+               data-model="on(change)|screenshot.title" data-action="change->live#action" data-live-action-param="save"
+               aria-label="Titre">
+        {% if _errors.has('screenshot.title') %}<div class="invalid-feedback">{{ _errors.get('screenshot.title') }}</div>{% endif %}
+
+        <label class="quick-edit__switch">
+            <span class="ea-switch ea-switch-sm">
+                <input type="checkbox" role="switch" class="ea-switch-input" {{ screenshot.published ? 'checked' }}
+                       data-model="screenshot.published" data-action="change->live#action" data-live-action-param="save">
+                <span class="ea-switch-track" aria-hidden="true"><span class="ea-switch-thumb"></span></span>
+            </span>
+            Publié
+        </label>
+
+        <div id="quick-edit-albums-{{ screenshot.id }}" data-skip-morph>
+            <select class="form-select form-select-sm" multiple data-controller="tom-select" data-model="albumIds" data-placeholder="Ajouter à un album…" aria-label="Albums">
+                {% for album in computed.albums %}
+                    <option value="{{ album.id }}" {{ screenshot.belongsTo(album) ? 'selected' }}>{{ album.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="quick-edit__game">
+            <div id="quick-edit-game-{{ screenshot.id }}" class="quick-edit__game-select" data-skip-morph>
+                <select class="form-select form-select-sm" data-controller="tom-select" data-model="gameId" aria-label="Jeu">
+                    <option value="">Jeu non défini</option>
+                    {% for game in computed.games %}
+                        <option value="{{ game.id }}" {{ screenshot.game == game ? 'selected' }}>{{ game.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% if not computed.awaitingAi %}
+                <button type="button" class="btn btn-sm btn-secondary" title="Relancer l'IA pour proposer de nouveaux tags"
+                        data-action="live#action" data-live-action-param="retag"><i class="fa fa-wand-magic-sparkles"></i></button>
+            {% endif %}
+        </div>
+
+        <div class="quick-edit__chips" aria-label="Tags">
+            {% if computed.awaitingAi %}
+                <span class="chip chip--pending"><i class="fa fa-wand-magic-sparkles fa-beat-fade"></i> L'IA analyse l'image…</span>
+            {% endif %}
+            {% for tag in screenshot.tags %}
+                <span class="chip chip--tag" title="{{ tag.path }}">{{ include('admin/_tag_label.html.twig') }}
+                    <button type="button" aria-label="Retirer {{ tag.name }}" data-action="live#action" data-live-action-param="removeTag" data-live-tag-id-param="{{ tag.id }}">×</button>
+                </span>
+            {% endfor %}
+            <input type="text" class="chip-input" placeholder="+ tag ou chemin/du/tag" data-model="norender|newTag"
+                   data-action="keydown.enter->live#action:prevent" data-live-action-param="addTag" aria-label="Ajouter un tag">
+        </div>
+    </div>
+</article>

@@ -1,0 +1,8 @@
+{% set link = entity.instance %}
+<span class="link-preview" style="--link-color: {{ link.color }}">
+    <span class="link-preview__icon">{{ ux_icon(link.icon) }}</span>
+    <span>
+        <strong>{{ link.title }}</strong>
+        {% if link.subtitle %}<span class="link-preview__subtitle">{{ link.subtitle }}</span>{% endif %}
+    </span>
+</span>

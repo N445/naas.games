@@ -1,0 +1,24 @@
+{% set series = computed.series %}
+<div {{ attributes.defaults({class: 'statistics-chart'}) }}>
+    <div class="statistics-chart__header">
+        <h2 class="dashboard-panel__title">
+            Audience
+            <small class="text-muted">
+                {{ series.views|reduce((total, value) => total + value, 0)|number_format(0, ',', ' ') }} vues ·
+                {{ series.downloads|reduce((total, value) => total + value, 0)|number_format(0, ',', ' ') }} téléchargements
+            </small>
+        </h2>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Période">
+            {% for value, label in constant('App\\Twig\\Components\\Admin\\StatisticsChart::PERIODS') %}
+                <button type="button" class="btn {{ days == value ? 'btn-primary' : 'btn-secondary' }}"
+                        data-action="live#action" data-live-action-param="showPeriod" data-live-days-param="{{ value }}">{{ label }}</button>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="chart-container" data-controller="chart"
+         data-chart-type-value="line"
+         data-chart-labels-value="{{ series.labels|json_encode }}"
+         data-chart-datasets-value="{{ [{label: 'Vues', data: series.views}, {label: 'Téléchargements', data: series.downloads}]|json_encode }}">
+        <canvas data-chart-target="canvas"></canvas>
+    </div>
+</div>

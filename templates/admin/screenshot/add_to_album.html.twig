@@ -1,0 +1,41 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Ajouter {{ screenshots|length }} screenshot(s) à un album{% endblock %}
+
+{% block main %}
+    <form method="post" action="{{ path('APP_ADMIN_screenshot_assign_album') }}" class="dashboard-panel">
+        <input type="hidden" name="_token" value="{{ csrf_token(csrfTokenId) }}">
+        {% for screenshot in screenshots %}
+            <input type="hidden" name="screenshots[]" value="{{ screenshot.id }}">
+        {% endfor %}
+
+        <div class="screenshot-grid screenshot-grid--compact">
+            {% for screenshot in screenshots %}
+                <figure class="screenshot-card">
+                    <img src="{{ screenshot.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy">
+                    <figcaption class="screenshot-card__caption">{{ screenshot.title }}</figcaption>
+                </figure>
+            {% endfor %}
+        </div>
+
+        <div class="row g-3 mt-2">
+            <div class="col-md-6">
+                <label class="form-label" for="album">Album existant</label>
+                <select id="album" name="album" class="form-select" data-controller="tom-select">
+                    {% for album in albums %}
+                        <option value="{{ album.id }}">{{ album.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="new_album">… ou nouvel album</label>
+                <input id="new_album" name="new_album" type="text" class="form-control" placeholder="Titre du nouvel album">
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+            <twig:ea:Button variant="primary" icon="fa fa-check">Ajouter à l'album</twig:ea:Button>
+            <twig:ea:Button htmlElement="a" href="{{ path('APP_ADMIN_screenshot_index') }}">Annuler</twig:ea:Button>
+        </div>
+    </form>
+{% endblock %}

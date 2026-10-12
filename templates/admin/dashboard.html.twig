@@ -1,0 +1,83 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Tableau de bord{% endblock %}
+
+{% block page_actions %}
+    <twig:ea:Button htmlElement="a" href="{{ path('APP_ADMIN_screenshot_upload_index') }}" variant="primary" icon="fa fa-cloud-arrow-up">Importer des screenshots</twig:ea:Button>
+{% endblock %}
+
+{% block main %}
+    <div class="stat-cards">
+        {% for card in [
+            {label: 'Screenshots', value: summary.screenshots|number_format(0, ',', ' '), icon: 'fa-images', url: path('APP_ADMIN_screenshot_index')},
+            {label: 'Albums', value: albumCount|number_format(0, ',', ' '), icon: 'fa-book-open', url: path('APP_ADMIN_album_index')},
+            {label: 'Vues', value: summary.views|number_format(0, ',', ' '), icon: 'fa-eye'},
+            {label: 'Téléchargements', value: summary.downloads|number_format(0, ',', ' '), icon: 'fa-download'},
+            {label: 'Espace utilisé', value: summary.storage|file_size, icon: 'fa-hard-drive'},
+            {label: 'Sans album', value: summary.unsorted|number_format(0, ',', ' '), icon: 'fa-inbox', url: path('APP_ADMIN_screenshot_index')},
+        ] %}
+            <a class="stat-card" {% if card.url is defined %}href="{{ card.url }}"{% endif %}>
+                <i class="fa {{ card.icon }} stat-card__icon"></i>
+                <span class="stat-card__value">{{ card.value }}</span>
+                <span class="stat-card__label">{{ card.label }}</span>
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="dashboard-grid">
+        <section class="dashboard-panel dashboard-panel--wide">
+            <twig:Admin:StatisticsChart />
+        </section>
+
+        <section class="dashboard-panel">
+            <h2 class="dashboard-panel__title">Imports par mois</h2>
+            <div class="chart-container" data-controller="chart"
+                 data-chart-type-value="bar"
+                 data-chart-labels-value="{{ monthlyUploads.labels|json_encode }}"
+                 data-chart-datasets-value="{{ [{label: 'Imports', data: monthlyUploads.uploads}]|json_encode }}">
+                <canvas data-chart-target="canvas"></canvas>
+            </div>
+        </section>
+
+        <section class="dashboard-panel">
+            <h2 class="dashboard-panel__title">Les plus vus</h2>
+            {{ include('admin/_screenshot_list.html.twig', {screenshots: mostViewed, metric: 'viewCount', icon: 'fa-eye'}) }}
+        </section>
+
+        <section class="dashboard-panel">
+            <h2 class="dashboard-panel__title">Les plus téléchargés</h2>
+            {{ include('admin/_screenshot_list.html.twig', {screenshots: mostDownloaded, metric: 'downloadCount', icon: 'fa-download'}) }}
+        </section>
+
+        <section class="dashboard-panel">
+            <h2 class="dashboard-panel__title">Albums populaires</h2>
+            <ul class="screenshot-list">
+                {% for album in topAlbums %}
+                    <li>
+                        <a href="{{ path('APP_ADMIN_album_detail', {entityId: album.id}) }}">
+                            {% if album.cover %}<img src="{{ album.cover.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy">{% else %}<span class="screenshot-list__placeholder"><i class="fa fa-image"></i></span>{% endif %}
+                            <span class="screenshot-list__title">{{ album.title }} <small class="text-muted">· {{ album.countScreenshots }} images</small></span>
+                        </a>
+                        <span class="screenshot-list__metric">{{ album.viewCount|number_format(0, ',', ' ') }} <i class="fa fa-eye"></i></span>
+                    </li>
+                {% else %}
+                    <li class="text-muted">Aucun album. <a href="{{ path('APP_ADMIN_album_new') }}">En créer un</a></li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="dashboard-panel dashboard-panel--wide">
+            <h2 class="dashboard-panel__title">Derniers imports</h2>
+            <div class="screenshot-grid">
+                {% for screenshot in latest %}
+                    <a class="screenshot-card" href="{{ path('APP_ADMIN_screenshot_edit', {entityId: screenshot.id}) }}">
+                        <img src="{{ screenshot.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy">
+                        <span class="screenshot-card__caption">{{ screenshot.title }}</span>
+                    </a>
+                {% else %}
+                    <p class="text-muted">Rien d'importé pour l'instant. <a href="{{ path('APP_ADMIN_screenshot_upload_index') }}">Importer vos premiers screenshots</a></p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+{% endblock %}

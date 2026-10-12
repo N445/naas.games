@@ -1,0 +1,14 @@
+{% extends '@EasyAdmin/crud/detail.html.twig' %}
+
+{% block main %}
+    {% set screenshot = entity.instance %}
+    <div class="screenshot-detail">
+        <a class="screenshot-detail__preview" href="{{ path('APP_ADMIN_screenshot_original', {id: screenshot.id}) }}" target="_blank">
+            <img src="{{ screenshot.path|imagine_filter('screenshot_preview') }}" alt="{{ screenshot.title }}">
+        </a>
+        <div class="screenshot-detail__fields">{{ parent() }}</div>
+    </div>
+    <section class="dashboard-panel">
+        <twig:Admin:StatisticsChart screenshot="{{ screenshot }}" />
+    </section>
+{% endblock %}

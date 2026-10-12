@@ -1,0 +1,6 @@
+{% if field.value %}
+    <span class="d-inline-flex align-items-center gap-2" title="{{ field.value }}">
+        {{ ux_icon(field.value, {height: '1.5em', width: '1.5em'}) }}
+        <code>{{ field.value }}</code>
+    </span>
+{% endif %}

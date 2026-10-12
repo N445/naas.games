@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Naas · Liens{% endblock %}
+
+{% block body %}
+    {% set background_url = background
+        ? background.path|imagine_filter('screenshot_preview')
+        : asset('images/StarCitizen 2025-04-12 13-48-41.png') %}
+
+    <main class="links-page" style="--links-background: url('{{ background_url }}')">
+        <section class="links-card" aria-labelledby="links-title">
+            <header class="links-card__header">
+                <a href="{{ path('APP_HOMEPAGE') }}" class="links-card__logo" aria-label="Retour au site de Naas">
+                    <img src="{{ 'images/naas-logo.png'|imagine_filter('main_logo') }}" alt="" width="96" height="96">
+                </a>
+                <h1 id="links-title">Naas</h1>
+                <p>Screenshots, streams et aventures dans le 'verse</p>
+            </header>
+
+            <ul class="links-list" data-controller="links">
+                <li>
+                    <a class="link-card" href="{{ path('APP_HOMEPAGE') }}" style="--link-color: #ff4506">
+                        <span class="link-card__icon">{{ ux_icon('fa7-solid:globe') }}</span>
+                        <span class="link-card__text">
+                            <span class="link-card__title">Site officiel</span>
+                            <span class="link-card__subtitle">{{ app.request.host }}</span>
+                        </span>
+                        <span class="link-card__arrow" aria-hidden="true">{{ ux_icon('fa7-solid:arrow-right') }}</span>
+                    </a>
+                </li>
+                {% for link in links %}
+                    <li>
+                        <a class="link-card" href="{{ link.url }}" target="_blank" rel="noopener" style="--link-color: {{ link.color }}"
+                           data-action="links#track" data-links-title-param="{{ link.title }}">
+                            <span class="link-card__icon">{{ ux_icon(link.icon) }}</span>
+                            <span class="link-card__text">
+                                <span class="link-card__title">{{ link.title }}</span>
+                                {% if link.subtitle %}<span class="link-card__subtitle">{{ link.subtitle }}</span>{% endif %}
+                            </span>
+                            <span class="link-card__arrow" aria-hidden="true">{{ ux_icon('fa7-solid:arrow-up-right-from-square') }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </main>
+{% endblock %}

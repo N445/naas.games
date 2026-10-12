@@ -1,0 +1,8 @@
+live_component:
+    resource: '@LiveComponentBundle/config/routes.php'
+    prefix: '/_components'
+
+APP_ADMIN_LIVE_COMPONENT:
+    path: '%app.admin_path%/_components/{_live_component}/{_live_action}'
+    defaults:
+        _live_action: get

@@ -1,0 +1,49 @@
+{% set is_expanded = node.hasChildren and this.isExpanded(node.id) %}
+<li class="tag-node" id="tag-node-{{ node.id }}">
+    <div class="tag-node__row {{ editingId is same as(node.id) ? 'is-editing' }}" data-tag-id="{{ node.id }}" draggable="{{ editingId is same as(node.id) ? 'false' : 'true' }}"
+         data-action="dragstart->tag-tree#dragStart dragend->tag-tree#dragEnd dragover->tag-tree#dragOver dragleave->tag-tree#dragLeave drop->tag-tree#drop">
+        {% if node.hasChildren %}
+            <button type="button" class="tag-node__toggle" aria-expanded="{{ is_expanded ? 'true' : 'false' }}" aria-label="{{ is_expanded ? 'Replier' : 'Déplier' }} {{ node.name }}"
+                    data-action="live#action" data-live-action-param="toggle" data-live-tag-id-param="{{ node.id }}">
+                <i class="fa fa-chevron-{{ is_expanded ? 'down' : 'right' }}"></i>
+            </button>
+        {% else %}
+            <span class="tag-node__toggle tag-node__toggle--leaf"><i class="fa fa-circle"></i></span>
+        {% endif %}
+
+        <i class="fa fa-grip-vertical tag-node__grip" aria-hidden="true"></i>
+
+        {% if editingId is same as(node.id) %}
+            {{ include('components/Admin/_tag_tree_input.html.twig', {placeholder: 'Nouveau nom'}) }}
+        {% else %}
+            <span class="tag-node__name {{ query and node.matches(query) ? 'is-match' }}" title="Double-cliquez pour renommer"
+                  data-action="dblclick->live#action" data-live-action-param="startEdit" data-live-tag-id-param="{{ node.id }}" data-live-name-param="{{ node.name }}">{{ node.name }}</span>
+
+            <a class="tag-node__count" href="{{ path('APP_ADMIN_screenshot_index', {filters: {tags: {comparison: '=', value: node.id}}}) }}"
+               title="{{ node.screenshotCount }} image(s) avec ce tag, {{ node.totalScreenshotCount }} avec les sous-tags">
+                <i class="fa fa-image"></i> {{ node.screenshotCount }}{% if node.totalScreenshotCount != node.screenshotCount %}<span class="tag-node__count-total"> · {{ node.totalScreenshotCount }}</span>{% endif %}
+            </a>
+
+            <span class="tag-node__actions">
+                <button type="button" title="Ajouter un sous-tag" data-action="live#action" data-live-action-param="startAdd" data-live-parent-id-param="{{ node.id }}"><i class="fa fa-plus"></i></button>
+                <button type="button" title="Renommer" data-action="live#action" data-live-action-param="startEdit" data-live-tag-id-param="{{ node.id }}" data-live-name-param="{{ node.name }}"><i class="fa fa-pen"></i></button>
+                <button type="button" class="is-danger" title="Supprimer"
+                        data-action="tag-tree#confirmDelete" data-tag-id="{{ node.id }}" data-tag-name="{{ node.name }}"
+                        data-screenshots="{{ node.screenshotCount }}" data-children="{{ node.children|length }}"><i class="fa fa-trash"></i></button>
+            </span>
+        {% endif %}
+    </div>
+
+    {% if is_expanded or addingTo is same as(node.id) %}
+        <ul class="tag-tree__list">
+            {% if addingTo is same as(node.id) %}
+                <li class="tag-node">{{ include('components/Admin/_tag_tree_input.html.twig', {placeholder: 'Sous-tag de « ' ~ node.name ~ ' »'}) }}</li>
+            {% endif %}
+            {% if is_expanded %}
+                {% for node in node.children %}
+                    {{ include('components/Admin/_tag_tree_node.html.twig') }}
+                {% endfor %}
+            {% endif %}
+        </ul>
+    {% endif %}
+</li>

@@ -1,0 +1,6 @@
+{% set cover = entity.instance.cover %}
+{% if cover %}
+    <img class="album-cover-thumbnail" src="{{ cover.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy">
+{% else %}
+    <span class="album-cover-thumbnail album-cover-thumbnail--empty"><i class="fa fa-image"></i></span>
+{% endif %}

@@ -1,0 +1,13 @@
+<ul class="screenshot-list">
+    {% for screenshot in screenshots %}
+        <li>
+            <a href="{{ path('APP_ADMIN_screenshot_detail', {entityId: screenshot.id}) }}">
+                <img src="{{ screenshot.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy">
+                <span class="screenshot-list__title">{{ screenshot.title }}</span>
+            </a>
+            <span class="screenshot-list__metric">{{ attribute(screenshot, metric)|number_format(0, ',', ' ') }} <i class="fa {{ icon }}"></i></span>
+        </li>
+    {% else %}
+        <li class="text-muted">Aucune donnée pour l'instant.</li>
+    {% endfor %}
+</ul>

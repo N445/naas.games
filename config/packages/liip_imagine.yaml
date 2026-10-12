@@ -13,6 +13,11 @@ liip_imagine:
   webp:
     generate: true
 
+  loaders:
+    screenshots:
+      filesystem:
+        data_root: '%app.screenshots_directory%'
+
   resolvers:
     default:
       web_path:
@@ -30,3 +35,28 @@ liip_imagine:
         fixed:
           width: 320
           height: 420
+    screenshot_thumbnail:
+      data_loader: screenshots
+      quality: 80
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [480, 300], mode: outbound }
+    screenshot_preview:
+      data_loader: screenshots
+      quality: 85
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [1920, 1080], mode: inset }
+    album_cover:
+      data_loader: screenshots
+      quality: 80
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [800, 500], mode: outbound }
+    ai_analysis:
+      data_loader: screenshots
+      format: jpg
+      quality: 85
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [1568, 1568], mode: inset }

@@ -1,0 +1,9 @@
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block datagrid %}
+    <div data-controller="admin-sortable"
+         data-admin-sortable-url-value="{{ path('APP_ADMIN_link_sort') }}"
+         data-admin-sortable-token-value="{{ csrf_token(constant('App\\Controller\\Admin\\LinkCrudController::SORT_TOKEN')) }}">
+        {{ parent() }}
+    </div>
+{% endblock %}

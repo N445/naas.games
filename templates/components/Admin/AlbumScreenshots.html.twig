@@ -1,0 +1,46 @@
+<div {{ attributes.defaults({class: 'album-manager'}) }}>
+    <section class="dashboard-panel">
+        <h2 class="dashboard-panel__title">
+            Contenu de l'album <small class="text-muted">· {{ album.countScreenshots }} images</small>
+        </h2>
+        <div class="screenshot-grid">
+            {% for screenshot in album.screenshots %}
+                <figure class="screenshot-card {{ album.hasCover(screenshot) ? 'screenshot-card--cover' }}" data-loading="addClass(is-loading)">
+                    <img src="{{ screenshot.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy">
+                    {% if album.hasCover(screenshot) %}<span class="screenshot-card__badge"><i class="fa fa-star"></i> Couverture</span>{% endif %}
+                    <figcaption class="screenshot-card__caption">{{ screenshot.title }}</figcaption>
+                    <div class="screenshot-card__actions">
+                        {% if not album.hasCover(screenshot) %}
+                            <button type="button" class="btn btn-sm btn-light" title="Définir comme couverture"
+                                    data-action="live#action" data-live-action-param="useAsCover" data-live-screenshot-id-param="{{ screenshot.id }}"><i class="fa fa-star"></i></button>
+                        {% endif %}
+                        <a class="btn btn-sm btn-light" title="Modifier" href="{{ path('APP_ADMIN_screenshot_edit', {entityId: screenshot.id}) }}"><i class="fa fa-pen"></i></a>
+                        <button type="button" class="btn btn-sm btn-light" title="Retirer de l'album"
+                                data-action="live#action" data-live-action-param="remove" data-live-screenshot-id-param="{{ screenshot.id }}"><i class="fa fa-xmark"></i></button>
+                    </div>
+                </figure>
+            {% else %}
+                <p class="text-muted">Cet album est vide. Importez des screenshots ou ajoutez-en depuis la photothèque ci-dessous.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="dashboard-panel">
+        <div class="statistics-chart__header">
+            <h2 class="dashboard-panel__title">Ajouter depuis la photothèque</h2>
+            <input type="search" class="form-control album-manager__search" placeholder="Rechercher un screenshot…" data-model="debounce(300)|search">
+        </div>
+        <div class="screenshot-grid screenshot-grid--compact">
+            {% for screenshot in computed.candidates %}
+                <button type="button" class="screenshot-card screenshot-card--selectable" title="Ajouter « {{ screenshot.title }} »"
+                        data-action="live#action" data-live-action-param="add" data-live-screenshot-id-param="{{ screenshot.id }}">
+                    <img src="{{ screenshot.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy">
+                    <span class="screenshot-card__add"><i class="fa fa-plus"></i></span>
+                    <span class="screenshot-card__caption">{{ screenshot.title }}</span>
+                </button>
+            {% else %}
+                <p class="text-muted">Aucun screenshot à ajouter{{ search ? ' pour « ' ~ search ~ ' »' }}.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>

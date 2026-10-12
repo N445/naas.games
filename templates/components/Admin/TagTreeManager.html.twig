@@ -1,0 +1,46 @@
+{% set tree = computed.tree %}
+<div {{ attributes.defaults({class: 'tag-tree'}) }}>
+    <div data-controller="tag-tree">
+        <div class="tag-tree__toolbar">
+            <div class="tag-tree__search">
+                <i class="fa fa-magnifying-glass"></i>
+                <input type="search" class="form-control" placeholder="Filtrer les tags…" data-model="debounce(250)|query" aria-label="Filtrer les tags">
+            </div>
+            <div class="tag-tree__toolbar-actions">
+                <twig:ea:Button type="button" size="sm" icon="fa fa-plus" variant="primary" data-action="live#action" data-live-action-param="startAdd" data-live-parent-id-param="0">Tag racine</twig:ea:Button>
+                <twig:ea:Button type="button" size="sm" icon="fa fa-angles-down" data-action="live#action" data-live-action-param="expandAll">Tout déplier</twig:ea:Button>
+                <twig:ea:Button type="button" size="sm" icon="fa fa-angles-up" data-action="live#action" data-live-action-param="collapseAll">Tout replier</twig:ea:Button>
+            </div>
+        </div>
+
+        {% if notice %}
+            <div class="tag-tree__notice tag-tree__notice--{{ noticeIsError ? 'error' : 'success' }}" role="status">
+                <i class="fa {{ noticeIsError ? 'fa-triangle-exclamation' : 'fa-check' }}"></i> {{ notice }}
+            </div>
+        {% endif %}
+
+        <p class="tag-tree__help">
+            Glissez un tag sur un autre pour l'y ranger, ou sur la zone « Racine » pour le sortir de sa branche.
+            Double-cliquez sur un nom pour le renommer.
+        </p>
+
+        <div class="tag-tree__root-drop" data-tag-id="0"
+             data-action="dragover->tag-tree#dragOver dragleave->tag-tree#dragLeave drop->tag-tree#drop">
+            <i class="fa fa-sitemap"></i> Racine <small>· {{ tree.count }} tag{{ tree.count > 1 ? 's' }}{{ query ? ' trouvés' }}</small>
+        </div>
+
+        {% if addingTo is same as(0) %}
+            {{ include('components/Admin/_tag_tree_input.html.twig', {placeholder: 'Nom du nouveau tag racine'}) }}
+        {% endif %}
+
+        {% if tree.isEmpty %}
+            <p class="text-muted tag-tree__empty">{{ query ? 'Aucun tag ne correspond à « ' ~ query ~ ' ».' : 'Aucun tag pour l\'instant.' }}</p>
+        {% else %}
+            <ul class="tag-tree__list" data-loading="addClass(is-loading)">
+                {% for node in tree.roots %}
+                    {{ include('components/Admin/_tag_tree_node.html.twig') }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</div>

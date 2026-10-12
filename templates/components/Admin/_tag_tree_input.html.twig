@@ -1,0 +1,7 @@
+<div class="tag-tree__input">
+    <input type="text" class="form-control form-control-sm" placeholder="{{ placeholder }}" value="{{ draft }}" maxlength="100"
+           data-controller="autofocus" data-model="norender|draft"
+           data-action="keydown.enter->live#action:prevent keydown.esc->tag-tree#cancel" data-live-action-param="save">
+    <button type="button" class="btn btn-sm btn-primary" title="Enregistrer" data-action="live#action" data-live-action-param="save"><i class="fa fa-check"></i></button>
+    <button type="button" class="btn btn-sm btn-secondary" title="Annuler" data-action="live#action" data-live-action-param="cancel"><i class="fa fa-xmark"></i></button>
+</div>
