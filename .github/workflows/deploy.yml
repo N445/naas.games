@@ -1,0 +1,101 @@
+name: Déploiement
+
+on:
+  push:
+    branches: [dev, prod]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    name: Construire et publier les images
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      - id: sha
+        run: echo "court=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # provenance: false — sinon GHCR pousse un index d'attestation et ne rattache pas le package au dépôt.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          target: prod
+          push: true
+          provenance: false
+          sbom: false
+          build-args: |
+            VERSION=${{ steps.sha.outputs.court }}
+            REVISION=${{ github.sha }}
+          tags: |
+            ghcr.io/n445/naas-games:${{ github.ref_name }}
+            ghcr.io/n445/naas-games:${{ steps.sha.outputs.court }}
+          cache-from: type=gha,scope=app
+          cache-to: type=gha,mode=max,scope=app
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: docker/vision
+          push: true
+          provenance: false
+          sbom: false
+          labels: org.opencontainers.image.source=https://github.com/N445/naas.games
+          tags: |
+            ghcr.io/n445/naas-games-vision:${{ github.ref_name }}
+            ghcr.io/n445/naas-games-vision:${{ steps.sha.outputs.court }}
+          cache-from: type=gha,scope=vision
+          cache-to: type=gha,mode=max,scope=vision
+
+  deploy:
+    name: Déployer sur le serveur ${{ github.ref_name }}
+    needs: build
+    if: github.ref_name == 'dev' || github.ref_name == 'prod'
+    runs-on: [self-hosted, "${{ github.ref_name }}"]
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      # Pas de docker/login-action : il écraserait puis supprimerait l'identifiant GHCR du serveur.
+
+      - id: sha
+        run: echo "court=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Résoudre le dossier de déploiement
+        run: |
+          root="${DEPLOY_ROOT:-$HOME/web}"
+          root="${root%"${root##*[!/]}"}"
+          dir="${DEPLOY_DIR:-$root/${GITHUB_REPOSITORY#*/}}"
+          echo "DEPLOY_DIR=$dir" >> "$GITHUB_ENV"
+          echo "déploiement dans $dir"
+
+      - name: Vérifier et mettre à jour les fichiers du serveur
+        run: |
+          test -f "$DEPLOY_DIR/.env" || { echo "manquant : $DEPLOY_DIR/.env"; exit 1; }
+          install -m 644 compose.prod.yaml "$DEPLOY_DIR/compose.yaml"
+          install -m 644 Makefile.prod "$DEPLOY_DIR/Makefile"
+
+      # TAG en variable d'environnement réelle : elle l'emporte sur le .env du serveur.
+      - name: Déployer
+        working-directory: ${{ env.DEPLOY_DIR }}
+        env:
+          TAG: ${{ steps.sha.outputs.court }}
+        run: make update

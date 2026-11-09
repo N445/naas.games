@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: intl, zip, pdo_mysql, apcu, imagick, exif
+          tools: composer:v2
+
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer validate --no-check-publish
+      - run: composer audit
+      - run: bin/console lint:yaml config translations
+      - run: bin/console lint:twig templates
+      - run: bin/console lint:container
