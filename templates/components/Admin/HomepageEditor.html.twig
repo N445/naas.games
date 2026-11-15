@@ -27,29 +27,6 @@
     <div class="homepage-editor__layout">
         <div>
             <section class="dashboard-panel">
-                <h2 class="dashboard-panel__title"><i class="fa fa-heading me-2"></i>Textes du hero</h2>
-                <p class="homepage-editor__help">Laissez un champ vide pour utiliser le texte anglais, puis le texte par défaut du site (affiché en gris).</p>
-                <div class="homepage-languages">
-                    {% for language in [
-                        {code: 'en', label: 'Anglais (langue par défaut)', title: 'heroTitleEn', subtitle: 'heroSubtitleEn'},
-                        {code: 'fr', label: 'Français', title: 'heroTitleFr', subtitle: 'heroSubtitleFr'},
-                    ] %}
-                        <fieldset>
-                            <legend class="form-label fw-semibold fs-6"><span class="homepage-languages__flag">{{ language.code|upper }}</span>{{ language.label }}</legend>
-                            <label class="form-label small" for="homepage-{{ language.title }}">Titre</label>
-                            <input type="text" class="form-control mb-2" id="homepage-{{ language.title }}" maxlength="120"
-                                   placeholder="{{ 'hero.title'|trans({}, 'home', language.code) }}"
-                                   value="{{ attribute(this, language.title) }}" data-model="debounce(400)|{{ language.title }}">
-                            <label class="form-label small" for="homepage-{{ language.subtitle }}">Sous-titre</label>
-                            <textarea class="form-control" id="homepage-{{ language.subtitle }}" rows="3" maxlength="300"
-                                      placeholder="{{ 'hero.subtitle'|trans({}, 'home', language.code) }}"
-                                      data-model="debounce(400)|{{ language.subtitle }}">{{ attribute(this, language.subtitle) }}</textarea>
-                        </fieldset>
-                    {% endfor %}
-                </div>
-            </section>
-
-            <section class="dashboard-panel">
                 <div class="statistics-chart__header">
                     <h2 class="dashboard-panel__title"><i class="fa fa-images me-2"></i>Images du hero <small class="text-muted">· {{ hero_screenshots|length }} sélectionnée{{ hero_screenshots|length > 1 ? 's' }}</small></h2>
                     {% if hero_screenshots is not empty %}
@@ -188,8 +165,8 @@
                     {% if preview_image %}
                         <img src="{{ preview_image.path|imagine_filter('album_cover') }}" alt="">
                     {% endif %}
-                    <p class="homepage-preview__title">{{ this.previewTitle ?: 'hero.title'|trans({}, 'home', previewLocale) }}</p>
-                    <p class="homepage-preview__subtitle">{{ this.previewSubtitle ?: 'hero.subtitle'|trans({}, 'home', previewLocale) }}</p>
+                    <p class="homepage-preview__title">{{ 'hero.title'|trans({}, 'home', previewLocale) }}</p>
+                    <p class="homepage-preview__subtitle">{{ 'hero.subtitle'|trans({}, 'home', previewLocale) }}</p>
                 </div>
             </section>
 

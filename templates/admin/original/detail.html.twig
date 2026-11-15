@@ -1,0 +1,25 @@
+{% extends '@EasyAdmin/crud/detail.html.twig' %}
+
+{% block main %}
+    {% set original = entity.instance %}
+    <div class="screenshot-detail">
+        <a class="screenshot-detail__preview" href="{{ path('APP_ADMIN_screenshot_original_view', {id: original.id}) }}" target="_blank">
+            <img src="{{ original.path|imagine_filter('screenshot_preview') }}" alt="{{ original.file.originalName }}">
+            <span class="screenshot-detail__meta">{{ original.file.dimensions }} · {{ original.file.size|file_size }}</span>
+        </a>
+        <div class="screenshot-detail__fields">{{ parent() }}</div>
+    </div>
+    {% if original.finals is not empty %}
+        <section class="dashboard-panel">
+            <h2 class="dashboard-panel__title">Finals tirés de cet original</h2>
+            <div class="screenshot-grid">
+                {% for final in original.finals %}
+                    <a class="original-final" href="{{ path('APP_ADMIN_screenshot_edit', {entityId: final.id}) }}">
+                        <img src="{{ final.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy">
+                        <span>{{ final.title }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}

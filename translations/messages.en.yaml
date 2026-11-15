@@ -1,5 +1,5 @@
 layout:
-    meta_description: "Naas — Star Citizen and Arc Raiders screenshots, albums and adventures across the 'verse."
+    meta_description: "Naas has played Star Citizen since 2022 and shares close to 300 screenshots from the 'verse here, plus a few from Arc Raiders, free to download in full res."
     skip_to_content: Skip to content
     home: Naas home page
     main_navigation: Main navigation
@@ -9,5 +9,7 @@ layout:
         gallery: Gallery
         links: Links
     footer:
-        tagline: Screenshots from the 'verse
+        tagline: Star Citizen screenshots, taken while playing
         rights: All rights reserved
+        unofficial: Unofficial fansite, not affiliated with or endorsed by the Cloud Imperium group of companies.
+        license: Image license

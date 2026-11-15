@@ -1,0 +1,67 @@
+<section {{ attributes.defaults({class: 'original-panel'}) }}>
+    <h2 class="original-panel__title"><i class="fa fa-panorama"></i> Original 32:9</h2>
+    {% set original = screenshot.original %}
+    {% if original %}
+        <div class="original-panel__linked">
+            <a class="original-panel__preview" href="{{ path('APP_ADMIN_screenshot_original_view', {id: original.id}) }}" target="_blank" title="Ouvrir l’original en pleine résolution">
+                <img src="{{ original.path|imagine_filter('screenshot_thumbnail') }}" alt="">
+            </a>
+            <div class="original-panel__meta">
+                <a href="{{ path('APP_ADMIN_screenshot_original_detail', {entityId: original.id}) }}"><strong>{{ original.file.originalName }}</strong></a>
+                <span>{{ original.file.dimensions }} · {{ original.file.size|file_size }}{{ not original.downloadable ? ' · non téléchargeable' }}</span>
+                {% set siblings = original.finals|filter(final => final != screenshot) %}
+                {% if siblings is not empty %}
+                    <span>Sert aussi à : {% for final in siblings %}<a href="{{ path('APP_ADMIN_screenshot_edit', {entityId: final.id}) }}">{{ final.title }}</a>{{ not loop.last ? ', ' }}{% endfor %}</span>
+                {% endif %}
+                <div class="original-panel__actions">
+                    <a class="btn btn-sm btn-secondary" href="{{ path('APP_ADMIN_screenshot_original_view', {id: original.id}) }}" target="_blank"><i class="fa fa-up-right-from-square"></i> Voir</a>
+                    <button type="button" class="btn btn-sm btn-secondary" data-action="live#action" data-live-action-param="unlink"><i class="fa fa-link-slash"></i> Délier</button>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p class="original-panel__empty">Aucun original rattaché.</p>
+        {% set candidates = computed.candidates %}
+        {% if candidates is not empty %}
+            <p class="original-panel__hint">Candidats (à confirmer) :</p>
+            <ul class="original-panel__candidates">
+                {% for candidate in candidates %}
+                    {{ _self.candidate(candidate.original, candidate.nameMatch ? 'même nom' : (candidate.similarity is not null ? 'ressemblance ' ~ (candidate.similarity * 100)|round ~ ' %' : 'prise le même jour')) }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <input type="search" class="form-control form-control-sm" placeholder="Chercher un original par nom de fichier…" aria-label="Chercher un original"
+               data-model="debounce(300)|search">
+        {% if computed.searchResults is not empty %}
+            <ul class="original-panel__candidates">
+                {% for result in computed.searchResults %}
+                    {{ _self.candidate(result, result.pending ? 'en attente' : result.finals|length ~ ' final(s)') }}
+                {% endfor %}
+            </ul>
+        {% elseif search|trim|length >= 3 %}
+            <p class="original-panel__hint">Aucun original ne correspond.</p>
+        {% endif %}
+    {% endif %}
+
+    {% if screenshot.panoramic and not original %}
+        {% set targets = computed.demotionTargets %}
+        <form class="original-panel__demote" method="post" action="{{ path('APP_ADMIN_screenshot_demote', {entityId: screenshot.id}) }}"
+              data-controller="confirm" data-confirm-message-value="Ce screenshot 32:9 sera retiré de la photothèque et deviendra un original (le fichier est conservé). Continuer ?"
+              data-action="submit->confirm#ask">
+            <input type="hidden" name="_token" value="{{ csrf_token('screenshot_demote_' ~ screenshot.id) }}">
+            <p class="original-panel__hint">
+                Ce screenshot est au format 32:9.
+                {% if targets is not empty %}Il porte le même nom que {% for final in targets %}<a href="{{ path('APP_ADMIN_screenshot_edit', {entityId: final.id}) }}">{{ final.title }}</a>{{ not loop.last ? ', ' }}{% endfor %} : c’est probablement son original.{% endif %}
+            </p>
+            <button type="submit" class="btn btn-sm btn-secondary"><i class="fa fa-arrow-down-short-wide"></i> Convertir en original</button>
+        </form>
+    {% endif %}
+</section>
+
+{% macro candidate(original, note) %}
+    <li class="original-candidate">
+        <a href="{{ path('APP_ADMIN_screenshot_original_view', {id: original.id}) }}" target="_blank"><img src="{{ original.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy"></a>
+        <span class="original-candidate__name" title="{{ original.file.originalName }}">{{ original.file.originalName }}<small>{{ note }}</small></span>
+        <button type="button" class="btn btn-sm btn-primary" data-action="live#action" data-live-action-param="link" data-live-original-id-param="{{ original.id }}"><i class="fa fa-link"></i> Lier</button>
+    </li>
+{% endmacro %}

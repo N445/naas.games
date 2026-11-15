@@ -1,13 +1,41 @@
+{%- macro alternates(route, params, locales) -%}
+{% for alternate in locales %}
+        <xhtml:link rel="alternate" hreflang="{{ alternate }}" href="{{ url(route, params|merge({_locale: alternate})) }}"/>
+{% endfor %}
+        <xhtml:link rel="alternate" hreflang="x-default" href="{{ url(route, params|merge({_locale: 'en'})) }}"/>
+{%- endmacro -%}
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 {% for page in pages %}
 {% for locale in locales %}
     <url>
         <loc>{{ url(page, {_locale: locale}) }}</loc>
-{% for alternate in locales %}
-        <xhtml:link rel="alternate" hreflang="{{ alternate }}" href="{{ url(page, {_locale: alternate}) }}"/>
+{{ _self.alternates(page, {}, locales) }}
+{% if lastmod and page != 'APP_LINKS' %}
+        <lastmod>{{ lastmod|date('c') }}</lastmod>
+{% endif %}
+    </url>
 {% endfor %}
-        <changefreq>{{ page == 'APP_LINKS' ? 'monthly' : 'weekly' }}</changefreq>
+{% endfor %}
+{% for album in albums %}
+{% for locale in locales %}
+    <url>
+        <loc>{{ url('APP_GALLERY', {_locale: locale, album: album.slug}) }}</loc>
+{{ _self.alternates('APP_GALLERY', {album: album.slug}, locales) }}
+        <lastmod>{{ album.updatedAt|date('c') }}</lastmod>
+{% if album.cover and album.cover.published %}
+        <image:image>
+            <image:loc>{{ album.cover.path|imagine_filter('front_hero') }}</image:loc>
+        </image:image>
+{% endif %}
+    </url>
+{% endfor %}
+{% endfor %}
+{% for game in games %}
+{% for locale in locales %}
+    <url>
+        <loc>{{ url('APP_GALLERY', {_locale: locale, game: game.slug}) }}</loc>
+{{ _self.alternates('APP_GALLERY', {game: game.slug}, locales) }}
     </url>
 {% endfor %}
 {% endfor %}
@@ -15,13 +43,10 @@
 {% for locale in locales %}
     <url>
         <loc>{{ url('APP_GALLERY', {_locale: locale, screenshot: screenshot.slug}) }}</loc>
-{% for alternate in locales %}
-        <xhtml:link rel="alternate" hreflang="{{ alternate }}" href="{{ url('APP_GALLERY', {_locale: alternate, screenshot: screenshot.slug}) }}"/>
-{% endfor %}
-        <lastmod>{{ screenshot.updatedAt|date('Y-m-d') }}</lastmod>
+{{ _self.alternates('APP_GALLERY', {screenshot: screenshot.slug}, locales) }}
+        <lastmod>{{ screenshot.updatedAt|date('c') }}</lastmod>
         <image:image>
-            <image:loc>{{ screenshot.path|imagine_filter('front_hero_md') }}</image:loc>
-            <image:title>{{ screenshot.title }}</image:title>
+            <image:loc>{{ screenshot.path|imagine_filter('front_hero') }}</image:loc>
         </image:image>
     </url>
 {% endfor %}

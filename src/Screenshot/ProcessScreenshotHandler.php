@@ -36,6 +36,9 @@ final readonly class ProcessScreenshotHandler
             return;
         }
 
+        if (null === $screenshot->getPerceptualHash()) {
+            $screenshot->rememberPerceptualHash(PerceptualHash::compute($this->storage->absolutePath($screenshot)));
+        }
         if (null === $screenshot->getPalette()) {
             $screenshot->usePalette($this->paletteExtractor->extract($this->storage->absolutePath($screenshot)));
         }

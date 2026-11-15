@@ -1,0 +1,43 @@
+{% extends 'front/layout.html.twig' %}
+{% trans_default_domain 'license' %}
+
+{% block title %}{{ 'meta.title'|trans }}{% endblock %}
+{% block meta_description %}{{ 'meta.description'|trans }}{% endblock %}
+{% set seo = {
+    breadcrumbs: [
+        {name: 'layout.nav.home'|trans({}, 'messages'), url: url('APP_HOMEPAGE')},
+        {name: 'title'|trans, url: url('APP_LICENSE')},
+    ],
+} %}
+
+{% block main %}
+    <article class="legal-page">
+        <h1>{{ 'title'|trans }}</h1>
+        <p class="legal-page__lead">{{ 'lead'|trans }}</p>
+
+        <h2>{{ 'allowed.title'|trans }}</h2>
+        <ul>
+            <li>{{ 'allowed.personal'|trans }}</li>
+            <li>{{ 'allowed.share'|trans }}</li>
+        </ul>
+
+        <h2>{{ 'forbidden.title'|trans }}</h2>
+        <ul>
+            <li>{{ 'forbidden.redistribute'|trans }}</li>
+            <li>{{ 'forbidden.commercial'|trans }}</li>
+            <li>{{ 'forbidden.modify'|trans }}</li>
+            <li>{{ 'forbidden.ai'|trans }}</li>
+        </ul>
+
+        <h2>{{ 'credit.title'|trans }}</h2>
+        <p>{{ 'credit.text'|trans }}</p>
+
+        <h2>{{ 'game.title'|trans }}</h2>
+        <p>{{ 'game.star_citizen'|trans }}</p>
+        <p>{{ 'game.others'|trans }}</p>
+        <p><strong>{{ 'layout.footer.unofficial'|trans({}, 'messages') }}</strong></p>
+
+        <h2>{{ 'contact.title'|trans }}</h2>
+        <p>{{ 'contact.text'|trans({'%x%': '<a href="https://x.com/NaasOff" rel="me noopener" target="_blank">@NaasOff</a>'})|raw }}</p>
+    </article>
+{% endblock %}

@@ -12,6 +12,7 @@
         </a>
         <div class="screenshot-detail__fields">
             {{ include('admin/_palette.html.twig', {palette: screenshot.palette, legend: true}) }}
+            <twig:Admin:OriginalPanel screenshot="{{ screenshot }}" id="original-panel-{{ screenshot.id }}" />
             {{ parent() }}
         </div>
     </div>

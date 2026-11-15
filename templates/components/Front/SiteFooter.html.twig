@@ -13,6 +13,9 @@
                 </li>
             {% endfor %}
         </ul>
-        <p class="site-footer__legal">© {{ 'now'|date('Y') }} Naas · {{ 'layout.footer.rights'|trans }}</p>
+        <p class="site-footer__legal">
+            © {{ 'now'|date('Y') }} Naas · {{ 'layout.footer.rights'|trans }} · <a href="{{ path('APP_LICENSE') }}">{{ 'layout.footer.license'|trans }}</a><br>
+            {{ 'layout.footer.unofficial'|trans }}
+        </p>
     </div>
 </footer>

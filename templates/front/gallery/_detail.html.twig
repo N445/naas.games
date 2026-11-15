@@ -14,7 +14,7 @@
         <h2 class="lightbox-detail__title" id="gallery-lightbox-title">{{ screenshot.title }}</h2>
         {% if screenshot.takenAt %}
             <p class="lightbox-detail__date">
-                <span class="fa-regular fa-calendar" aria-hidden="true"></span>
+                {{ ux_icon('fa7-regular:calendar', {'aria-hidden': 'true'}) }}
                 <time datetime="{{ screenshot.takenAt|date('Y-m-d\\TH:i') }}">{{ 'gallery.lightbox.taken'|trans({'%date%': screenshot.takenAt|gallery_date('long')}) }}</time>
             </p>
         {% endif %}
@@ -25,15 +25,27 @@
     {% endif %}
 
     <ul class="lightbox-detail__stats">
-        <li><span class="fa-regular fa-eye" aria-hidden="true"></span> {{ 'gallery.lightbox.views'|trans({'%count%': screenshot.viewCount}) }}</li>
-        <li><span class="fa-solid fa-download" aria-hidden="true"></span> {{ 'gallery.lightbox.downloads'|trans({'%count%': screenshot.downloadCount}) }}</li>
-        <li><span class="fa-regular fa-image" aria-hidden="true"></span> {{ file.dimensions }}</li>
+        <li>{{ ux_icon('fa7-regular:eye', {'aria-hidden': 'true'}) }} {{ 'gallery.lightbox.views'|trans({'%count%': screenshot.viewCount}) }}</li>
+        <li>{{ ux_icon('fa7-solid:download', {'aria-hidden': 'true'}) }} {{ 'gallery.lightbox.downloads'|trans({'%count%': screenshot.downloadCount}) }}</li>
+        <li>{{ ux_icon('fa7-regular:image', {'aria-hidden': 'true'}) }} {{ file.dimensions }}</li>
     </ul>
 
     <a class="gallery-button gallery-button--primary gallery-button--block" href="{{ path('APP_SCREENSHOT_DOWNLOAD', {slug: screenshot.slug}) }}" download>
-        <span class="fa-solid fa-download" aria-hidden="true"></span>
+        {{ ux_icon('fa7-solid:download', {'aria-hidden': 'true'}) }}
         {{ 'gallery.lightbox.download'|trans }} <span class="lightbox-detail__size">{{ file.size|file_size }}</span>
     </a>
+    {% if original_downloadable(screenshot) %}
+        {% set original_file = screenshot.original.file %}
+        <a class="gallery-button gallery-button--block lightbox-detail__original" href="{{ path('APP_SCREENSHOT_DOWNLOAD_ORIGINAL', {slug: screenshot.slug}) }}" download
+           title="{{ 'curation.original.download_hint'|trans({'%dimensions%': original_file.dimensions}, 'curation') }}">
+            {{ ux_icon('fa7-solid:panorama', {'aria-hidden': 'true'}) }}
+            {{ 'curation.original.download'|trans({}, 'curation') }} <span class="lightbox-detail__size">{{ original_file.dimensions }} · {{ original_file.size|file_size }}</span>
+        </a>
+    {% endif %}
+
+    {% if is_granted('ROLE_ADMIN') %}
+        {{ include('front/curation/_editor.html.twig') }}
+    {% endif %}
 
     {% if albums is not empty %}
         <section class="lightbox-detail__section">

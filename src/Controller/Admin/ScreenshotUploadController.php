@@ -6,6 +6,7 @@ use App\Entity\Album;
 use App\Entity\Game;
 use App\Repository\AlbumRepository;
 use App\Repository\GameRepository;
+use App\Screenshot\ImportMode;
 use App\Screenshot\ScreenshotImporter;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
@@ -61,17 +62,24 @@ final class ScreenshotUploadController extends AbstractController
     {
         $this->assertCsrfToken($request);
         $upload = $request->files->get('file');
-        $violations = $validator->validate($upload, new Image(maxSize: '100M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif']));
+        $violations = $validator->validate($upload, new Image(maxSize: '200M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/tiff']));
         if (!$upload instanceof UploadedFile || count($violations) > 0) {
             return $this->json(['error' => count($violations) > 0 ? $violations->get(0)->getMessage() : 'Aucun fichier reçu.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $result = $importer->import($upload, $this->findAlbum($request->request->getString('album')), $this->findGame($request->request->getString('game')));
-        $template = $request->request->getBoolean('compact') ? 'admin/screenshot/_uploaded_compact.html.twig' : 'admin/screenshot/_uploaded.html.twig';
+        $mode = ImportMode::tryFrom($request->request->getString('mode')) ?? ImportMode::Auto;
+        $result = $importer->import($upload, $this->findAlbum($request->request->getString('album')), $this->findGame($request->request->getString('game')), $mode);
+        $compact = $result->duplicate || $result->isOriginal() || $request->request->getBoolean('compact');
 
         return $this->json([
             'duplicate' => $result->duplicate,
-            'html' => $this->renderView($result->duplicate ? 'admin/screenshot/_uploaded_compact.html.twig' : $template, ['screenshot' => $result->screenshot, 'duplicate' => $result->duplicate]),
+            'original' => $result->isOriginal(),
+            'compact' => $compact,
+            'html' => $this->renderView($compact ? 'admin/screenshot/_uploaded_compact.html.twig' : 'admin/screenshot/_uploaded.html.twig', [
+                'screenshot' => $result->screenshot,
+                'duplicate' => $result->duplicate,
+                'result' => $result,
+            ]),
         ]);
     }
 

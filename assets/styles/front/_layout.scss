@@ -189,6 +189,18 @@ body.front {
         margin: 0;
         color: var(--naas-muted);
         font-size: var(--naas-text-xs);
+        line-height: 1.7;
+
+        a {
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+
+            &:hover,
+            &:focus-visible {
+                color: var(--naas-text);
+            }
+        }
     }
 }
 
@@ -209,4 +221,34 @@ body.front {
     clip: rect(0, 0, 0, 0) !important;
     white-space: nowrap !important;
     border: 0 !important;
+}
+
+.legal-page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: calc(var(--naas-header-height) + 48px) var(--naas-gutter) 0;
+    line-height: 1.7;
+
+    h1 {
+        margin-bottom: 16px;
+        font-size: var(--naas-title-md);
+    }
+
+    h2 {
+        margin: 40px 0 12px;
+        font-size: var(--naas-text-lg);
+    }
+
+    &__lead {
+        color: var(--naas-muted);
+        font-size: var(--naas-text-lg);
+    }
+
+    ul {
+        padding-left: 1.2em;
+    }
+
+    a {
+        color: var(--naas-accent);
+    }
 }

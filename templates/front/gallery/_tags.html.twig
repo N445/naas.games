@@ -11,7 +11,7 @@
                                 aria-controls="tag-branch-{{ node.id }}"
                                 aria-expanded="{{ active or node.leadsTo(filters.value('tag')) ? 'true' : 'false' }}"
                                 data-action="gallery-tag-tree#toggle">
-                            <span class="fa-solid fa-chevron-right" aria-hidden="true"></span>
+                            {{ ux_icon('fa7-solid:chevron-right', {'aria-hidden': 'true'}) }}
                             <span class="visually-hidden">{{ 'gallery.facets.tag_expand'|trans({'%name%': node.displayName}) }}</span>
                         </button>
                     {% else %}

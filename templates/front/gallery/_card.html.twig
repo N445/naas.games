@@ -1,7 +1,9 @@
 {% set file = screenshot.file %}
 {% set ratio = file.width / max(file.height, 1) %}
 {% set colors = screenshot.palette ? screenshot.palette.colors : [] %}
-<li class="gallery-card" data-gallery-explorer-target="card" data-slug="{{ screenshot.slug }}" data-flip-id="{{ screenshot.slug }}"
+{% set curating = is_granted('ROLE_ADMIN') %}
+<li class="gallery-card{{ curating and not screenshot.published ? ' is-unpublished' }}" data-gallery-explorer-target="card" data-slug="{{ screenshot.slug }}" data-flip-id="{{ screenshot.slug }}"
+    {%- if curating %} data-curation-id="{{ screenshot.id }}"{% endif %}
     style="--ratio: {{ ratio|round(4) }}; --tint: {{ colors[0].hex ?? '#141821' }}; --tint-alt: {{ colors[1].hex ?? colors[0].hex ?? '#1d2230' }}">
     <a class="gallery-card__link" id="gallery-card-{{ screenshot.slug }}"
        href="{{ path('APP_GALLERY', filters.toQuery|merge({screenshot: screenshot.slug})) }}"
@@ -12,7 +14,7 @@
                  src="{{ screenshot.path|imagine_filter('front_card') }}"
                  srcset="{{ include('front/_srcset.html.twig', {image: screenshot}) }}"
                  sizes="(max-width: 560px) 100vw, (max-width: 1023px) 70vw, {{ min((ratio * 420)|round, 1100) }}px"
-                 width="{{ file.width }}" height="{{ file.height }}" alt=""
+                 width="{{ file.width }}" height="{{ file.height }}" alt="{{ screenshot.title }}"
                  {{ eager ? 'fetchpriority="high"' : 'loading="lazy"' }} decoding="async">
         </span>
         <span class="gallery-card__overlay">
@@ -29,4 +31,8 @@
             {% endif %}
         </span>
     </a>
+    {% if curating %}
+        <span class="gallery-card__check" aria-hidden="true">{{ ux_icon('fa7-solid:check', {'aria-hidden': 'true'}) }}</span>
+        {% if not screenshot.published %}<span class="gallery-card__flag">{{ 'curation.unpublished'|trans({}, 'curation') }}</span>{% endif %}
+    {% endif %}
 </li>

@@ -1,0 +1,287 @@
+// Gallery editing tools (admins only, loaded by the "curation" entry).
+
+// --- Cards: selection mode & admin flags -----------------------------------
+.gallery-card__check {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    display: none;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 2px solid rgba(255, 255, 255, .85);
+    border-radius: 8px;
+    background: rgba(7, 8, 11, .55);
+    color: transparent;
+    font-size: 14px;
+    pointer-events: none;
+
+    &::after {
+        content: "✓";
+        font-weight: 800;
+    }
+}
+
+.gallery-card__flag {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(7, 8, 11, .75);
+    color: var(--naas-text);
+    font-size: var(--naas-text-xs);
+    font-weight: 700;
+    pointer-events: none;
+}
+
+.gallery-card.is-unpublished .gallery-card__link {
+    opacity: .55;
+    filter: grayscale(.6);
+}
+
+.gallery.is-curating {
+    .gallery-card__check {
+        display: grid;
+    }
+
+    .gallery-card__link {
+        cursor: copy;
+    }
+
+    .gallery-card.is-selected {
+        .gallery-card__link {
+            outline: 3px solid var(--naas-accent);
+            outline-offset: 2px;
+        }
+
+        .gallery-card__check {
+            border-color: var(--naas-accent);
+            background: var(--naas-accent);
+            color: #fff;
+        }
+    }
+
+    // The selection bar must not hide the last row.
+    .gallery-results {
+        padding-bottom: 180px;
+    }
+}
+
+.curation-toggle[aria-pressed="true"] {
+    border-color: var(--naas-accent);
+    background: var(--naas-accent-soft);
+}
+
+// --- Selection bar -----------------------------------------------------------
+.curation-bar {
+    position: fixed;
+    right: var(--naas-gutter);
+    bottom: 16px;
+    left: var(--naas-gutter);
+    z-index: 40;
+    display: grid;
+    gap: 10px;
+    max-width: var(--naas-max-width);
+    margin: 0 auto;
+    padding: 14px 18px;
+    border: 1px solid var(--naas-border);
+    border-radius: var(--naas-radius);
+    background: rgba(14, 16, 22, .94);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .55);
+    backdrop-filter: blur(14px);
+
+    &[hidden] {
+        display: none;
+    }
+
+    &__summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 16px;
+        align-items: baseline;
+    }
+
+    &__hint {
+        color: var(--naas-muted);
+        font-size: var(--naas-text-xs);
+    }
+
+    &__controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+
+        .gallery-button {
+            min-height: 40px;
+            padding: 8px 16px;
+        }
+    }
+
+    &__operation {
+        width: auto;
+        min-width: 190px;
+    }
+
+    &__field {
+        flex: 1 1 260px;
+        min-width: 0;
+
+        &[hidden] {
+            display: none;
+        }
+    }
+}
+
+// --- Inline editor (lightbox) -----------------------------------------------
+.curation-editor {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+    border: 1px dashed rgba(255, 69, 6, .45);
+    border-radius: var(--naas-radius-sm);
+    background: rgba(255, 69, 6, .05);
+
+    &__header {
+        display: flex;
+        gap: 12px;
+        align-items: baseline;
+        justify-content: space-between;
+
+        .lightbox-detail__heading {
+            margin: 0;
+        }
+    }
+
+    &__admin {
+        color: var(--naas-muted);
+        font-size: var(--naas-text-xs);
+    }
+
+    &__hint {
+        margin: 0;
+        color: var(--naas-muted);
+        font-size: var(--naas-text-xs);
+    }
+
+    &__footer {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.curation-field {
+    display: grid;
+    gap: 6px;
+
+    &__label {
+        color: var(--naas-muted);
+        font-size: var(--naas-text-xs);
+        font-weight: 600;
+    }
+}
+
+.curation-switch {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: var(--naas-text-sm);
+    cursor: pointer;
+
+    input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--naas-accent);
+    }
+}
+
+.curation-status {
+    min-height: 1.2em;
+    margin: 0;
+    color: var(--naas-muted);
+    font-size: var(--naas-text-xs);
+
+    &.is-error {
+        color: #f87171;
+    }
+}
+
+.curation-danger {
+    border-color: rgba(248, 113, 113, .45);
+    color: #fca5a5;
+
+    &:hover,
+    &:focus-visible {
+        border-color: #f87171;
+        background: rgba(248, 113, 113, .12);
+    }
+}
+
+// --- tom-select, dark theme ---------------------------------------------------
+.curation-editor,
+.curation-bar {
+    .ts-wrapper {
+        min-width: 0;
+    }
+
+    .ts-control {
+        min-height: 42px;
+        padding: 6px 10px;
+        border: 1px solid var(--naas-border);
+        border-radius: var(--naas-radius-sm);
+        background: var(--naas-bg);
+        color: var(--naas-text);
+        font-size: var(--naas-text-sm);
+        box-shadow: none;
+
+        > input {
+            color: var(--naas-text);
+
+            &::placeholder {
+                color: var(--naas-muted);
+            }
+        }
+    }
+
+    .ts-wrapper.focus .ts-control {
+        border-color: var(--naas-accent);
+    }
+
+    .ts-wrapper.single .ts-control,
+    .ts-wrapper.single.input-active .ts-control {
+        background: var(--naas-bg);
+    }
+
+    .ts-wrapper.multi .ts-control > div {
+        border: 0;
+        border-radius: 999px;
+        background: var(--naas-surface-hover);
+        color: var(--naas-text);
+    }
+
+    .ts-wrapper.plugin-remove_button .item .remove {
+        border-left-color: var(--naas-border);
+    }
+
+    .ts-dropdown {
+        border: 1px solid var(--naas-border);
+        border-radius: var(--naas-radius-sm);
+        background: var(--naas-bg-elevated);
+        color: var(--naas-text);
+
+        .active {
+            background: var(--naas-accent-soft);
+            color: var(--naas-text);
+        }
+
+        .create,
+        .no-results {
+            color: var(--naas-muted);
+        }
+    }
+}

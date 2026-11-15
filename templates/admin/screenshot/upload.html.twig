@@ -30,14 +30,21 @@
                 <input type="text" class="form-control" placeholder="Titre du nouvel album" hidden
                        data-screenshot-upload-target="newAlbum">
             </div>
+
+            <label class="form-label mt-3" for="upload-mode">Type d'images</label>
+            <select id="upload-mode" class="form-select" data-screenshot-upload-target="mode">
+                <option value="auto">Automatique : un 32:9 au nom d'un final devient son original</option>
+                <option value="originals">Originaux 32:9 (rattachés à leur final, ou en attente)</option>
+                <option value="screenshots">Screenshots uniquement (jamais d'original)</option>
+            </select>
         </div>
 
         <label class="dropzone" data-screenshot-upload-target="dropzone"
                data-action="dragenter->screenshot-upload#highlight dragover->screenshot-upload#highlight dragleave->screenshot-upload#unhighlight drop->screenshot-upload#drop">
             <i class="fa fa-cloud-arrow-up dropzone__icon"></i>
             <span class="dropzone__title">Glissez vos screenshots ici</span>
-            <span class="dropzone__hint">ou cliquez pour les sélectionner · JPG, PNG, WebP, GIF</span>
-            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden
+            <span class="dropzone__hint">ou cliquez pour les sélectionner · JPG, PNG, WebP, GIF (TIFF pour les originaux)</span>
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/tiff" multiple hidden
                    data-screenshot-upload-target="input" data-action="screenshot-upload#select">
         </label>
 

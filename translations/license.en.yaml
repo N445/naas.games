@@ -1,0 +1,25 @@
+meta:
+    title: Image license — Naas
+    description: "What you can do with my Star Citizen screenshots: personal use and wallpapers are fine; reposting or commercial use needs my permission first."
+title: Image license
+lead: "My screenshots are protected by copyright: all rights reserved. You're still welcome to enjoy them, within the limits below."
+allowed:
+    title: What you can do
+    personal: "Download an image and use it for yourself, non-commercially: wallpaper, screensaver, a print for your own wall."
+    share: Share the link to an image or to the site, anywhere you like.
+forbidden:
+    title: What needs my written permission
+    redistribute: "Reposting the images elsewhere (website, social media, stock library, wallpaper pack, and so on)."
+    commercial: "Any commercial use: selling, selling prints, advertising, monetised content."
+    modify: "Editing an image and sharing the result."
+    ai: "Using the images to train or feed an AI system."
+credit:
+    title: Credit
+    text: "If I give you permission to reuse an image, credit “Naas” with a link to naas.games."
+game:
+    title: Game content
+    star_citizen: "Star Citizen, Squadron 42 and everything from the game shown in these images (ships, characters, locations, logos) belong to Cloud Imperium Games and Roberts Space Industries. This license only covers my own work (framing, timing, editing) and gives you no rights to their content."
+    others: "The same goes for the other games on the site, such as Arc Raiders (Embark Studios): their content remains the property of their publishers."
+contact:
+    title: Ask me
+    text: "For anything else, please ask me first: the easiest way is a message on X, %x%."

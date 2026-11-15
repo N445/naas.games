@@ -15,11 +15,8 @@ liip_imagine:
       filesystem:
         data_root: '%app.screenshots_directory%'
 
-  resolvers:
-    default:
-      web_path:
-        web_root: '%kernel.project_dir%/public'
-        cache_prefix: 'media/cache'
+  # Cached files get the output format's extension (see App\Imagine\FormatAwareWebPathResolver).
+  cache: format_aware
 
   filter_sets:
     main_logo:
@@ -69,6 +66,53 @@ liip_imagine:
       filters:
         auto_rotate: ~
         thumbnail: { size: [1600, 900], mode: inset }
+    # Home hero, width-based ladder. WebP at quality 100 = lossless in ImageMagick (webp:lossless):
+    # no banding/blocking on dark space gradients, full 4:4:4 colour. Inset with a 9999 height never
+    # upscales, so front_hero_3840 serves the untouched native resolution when the original is smaller.
+    # strip converts the embedded ICC profile to sRGB before dropping it (also when no resize happens),
+    # so colours stay faithful and EXIF/XMP bytes are not shipped.
+    front_hero_1280:
+      data_loader: screenshots
+      format: webp
+      quality: 100
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [1280, 9999], mode: inset, filter: lanczos }
+        strip: ~
+    front_hero_1920:
+      data_loader: screenshots
+      format: webp
+      quality: 100
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [1920, 9999], mode: inset, filter: lanczos }
+        strip: ~
+    front_hero_2560:
+      data_loader: screenshots
+      format: webp
+      quality: 100
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [2560, 9999], mode: inset, filter: lanczos }
+        strip: ~
+    front_hero_3840:
+      data_loader: screenshots
+      format: webp
+      quality: 100
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [3840, 9999], mode: inset, filter: lanczos }
+        strip: ~
+    # Home hero, intermediate step only: light lossy preview shown right after the LQIP while the
+    # lossless variant above loads; it is always replaced (never the final frame, except with Save-Data).
+    front_hero_preview:
+      data_loader: screenshots
+      format: webp
+      quality: 80
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [1920, 9999], mode: inset, filter: lanczos }
+        strip: ~
     front_card:
       data_loader: screenshots
       quality: 82
@@ -99,3 +143,11 @@ liip_imagine:
       filters:
         auto_rotate: ~
         thumbnail: { size: [40, 40], mode: inset }
+    # Open Graph / Twitter card image: 1.91:1, JPEG for the widest crawler compatibility.
+    og_image:
+      data_loader: screenshots
+      format: jpg
+      quality: 88
+      filters:
+        auto_rotate: ~
+        thumbnail: { size: [1200, 630], mode: outbound, allow_upscale: true }

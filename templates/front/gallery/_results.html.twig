@@ -9,7 +9,7 @@
         {{ include('front/gallery/_more.html.twig') }}
     {% else %}
         <div class="gallery-empty">
-            <span class="gallery-empty__icon fa-solid fa-satellite" aria-hidden="true"></span>
+            {{ ux_icon('fa7-solid:satellite', {class: 'gallery-empty__icon', 'aria-hidden': 'true'}) }}
             <h3 class="gallery-empty__title">{{ 'gallery.results.empty_title'|trans }}</h3>
             <p class="gallery-empty__text">{{ 'gallery.results.empty_text'|trans }}</p>
             {% if not filters.empty %}

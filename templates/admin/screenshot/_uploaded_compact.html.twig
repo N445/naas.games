@@ -1,9 +1,30 @@
-<li class="upload-row {{ duplicate ? 'upload-row--duplicate' }}">
-    <i class="fa {{ duplicate ? 'fa-clone' : 'fa-check' }}" aria-hidden="true"></i>
-    <a href="{{ path('APP_ADMIN_screenshot_edit', {entityId: screenshot.id}) }}" class="upload-row__title">{{ screenshot.title }}</a>
-    {% if duplicate %}
-        <span class="upload-row__note">Déjà dans la photothèque, ignorée</span>
-    {% elseif screenshot.tags is not empty %}
-        <span class="upload-row__note">{{ screenshot.tags|length }} tag(s) digiKam</span>
-    {% endif %}
-</li>
+{% if result is defined and result.isOriginal %}
+    {% set original = result.original %}
+    <li class="upload-row upload-row--original {{ duplicate ? 'upload-row--duplicate' }}">
+        <i class="fa {{ duplicate ? 'fa-clone' : 'fa-panorama' }}" aria-hidden="true"></i>
+        <a href="{{ path('APP_ADMIN_screenshot_original_detail', {entityId: original.id}) }}" class="upload-row__title">{{ original.file.originalName }}</a>
+        <span class="upload-row__note">
+            {% if duplicate %}
+                Original déjà présent, ignoré
+            {% elseif result.finals is empty %}
+                Original 32:9 en attente de son final
+            {% else %}
+                Original 32:9 rattaché à
+                {% for final in result.finals %}<a href="{{ path('APP_ADMIN_screenshot_edit', {entityId: final.id}) }}">{{ final.title }}</a>{{ not loop.last ? ', ' }}{% endfor %}
+            {% endif %}
+        </span>
+    </li>
+{% else %}
+    <li class="upload-row {{ duplicate ? 'upload-row--duplicate' }}">
+        <i class="fa {{ duplicate ? 'fa-clone' : 'fa-check' }}" aria-hidden="true"></i>
+        <a href="{{ path('APP_ADMIN_screenshot_edit', {entityId: screenshot.id}) }}" class="upload-row__title">{{ screenshot.title }}</a>
+        {% if duplicate %}
+            <span class="upload-row__note">Déjà dans la photothèque, ignorée</span>
+        {% else %}
+            {% if screenshot.tags is not empty %}
+                <span class="upload-row__note">{{ screenshot.tags|length }} tag(s) digiKam</span>
+            {% endif %}
+            {{ include('admin/screenshot/_upload_notes.html.twig') }}
+        {% endif %}
+    </li>
+{% endif %}

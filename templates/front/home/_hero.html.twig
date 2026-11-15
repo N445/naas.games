@@ -1,6 +1,6 @@
 {% trans_default_domain 'home' %}
-{% set title = settings.heroTitle(locale) ?: 'hero.title'|trans %}
-{% set subtitle = settings.heroSubtitle(locale) ?: 'hero.subtitle'|trans %}
+{% set title = 'hero.title'|trans %}
+{% set subtitle = 'hero.subtitle'|trans %}
 <script>
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.documentElement.classList.add('home-motion');
@@ -14,18 +14,36 @@
     <div class="home-hero__media" data-home-hero-target="media">
         {% for screenshot in hero %}
             {% set file = screenshot.file %}
-            {% set hero_width = min(file.width, 2560, (file.width * 1440 / file.height)|round) %}
-            {% set medium_width = min(file.width, 1600, (file.width * 900 / file.height)|round) %}
+            {# Width ladder capped at the native width: never upscaled, the last candidate is the original itself when it is narrower than 3840. #}
+            {% set hero_srcset = [] %}
+            {% for step_width, step_filter in {1280: 'front_hero_1280', 1920: 'front_hero_1920', 2560: 'front_hero_2560'} %}
+                {% if step_width < file.width %}
+                    {% set hero_srcset = hero_srcset|merge([screenshot.path|imagine_filter(step_filter) ~ ' ' ~ step_width ~ 'w']) %}
+                {% endif %}
+            {% endfor %}
+            {% set hero_src = screenshot.path|imagine_filter('front_hero_3840') %}
+            {% set hero_srcset = hero_srcset|merge([hero_src ~ ' ' ~ min(file.width, 3840) ~ 'w']) %}
+            {# object-fit: cover fills the viewport, so the rendered width is the larger of the viewport width and its height times the aspect ratio (ultrawide shots are height-bound). #}
+            {# Floored to 2 decimals: the variants' rounded heights already cover the viewport, and an over-estimate of a single pixel would make Firefox/Safari jump to the next (much heavier) candidate. #}
+            {% set hero_ratio = (file.width / file.height * 100)|round(0, 'floor') / 100 %}
             <figure class="home-hero__slide{{ loop.first ? ' is-active' }}" {% if not loop.first %}aria-hidden="true"{% endif %} style="--slide-tint: {{ include('front/home/_tint.html.twig') }}; {{ include('front/_lqip.html.twig', {image: screenshot}) }}"
                     data-home-hero-target="slide"
                     data-title="{{ screenshot.title }}"
                     data-meta="{{ screenshot.game ? screenshot.game.name }}{{ screenshot.game and screenshot.takenAt ? ' · ' }}{{ screenshot.takenAt ? screenshot.takenAt|date(date_format) }}"
                     data-href="{{ path('APP_GALLERY', {screenshot: screenshot.slug}) }}">
-                <img src="{{ screenshot.path|imagine_filter('front_hero') }}"
-                     srcset="{{ screenshot.path|imagine_filter('front_card') }} {{ min(file.width, 960) }}w, {{ screenshot.path|imagine_filter('front_hero_md') }} {{ medium_width }}w, {{ screenshot.path|imagine_filter('front_hero') }} {{ hero_width }}w"
-                     sizes="100vw" width="{{ file.width }}" height="{{ file.height }}"
-                     alt="{{ screenshot.title }}" decoding="async"
-                     {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
+                {% set hero_sizes = 'max(100vw, calc(100vh * ' ~ hero_ratio ~ ')), 100vw' %}
+                {# Step 1: light lossy preview, in the HTML so the first one is found by the preload scanner. #}
+                <img class="home-hero__preview" src="{{ screenshot.path|imagine_filter('front_hero_preview') }}"
+                     width="{{ file.width }}" height="{{ file.height }}" alt="" decoding="async"
+                     {% if loop.first %}fetchpriority="high"{% else %}loading="lazy" fetchpriority="low"{% endif %}>
+                {# Step 2: lossless final picked by srcset/sizes; the controller sets srcset only after the preview, then swaps once decoded. #}
+                <img class="home-hero__final"
+                     data-srcset="{{ hero_srcset|join(', ') }}" data-sizes="{{ hero_sizes }}"
+                     width="{{ file.width }}" height="{{ file.height }}" alt="{{ screenshot.title }}" decoding="async">
+                <noscript>
+                    <img class="home-hero__final is-loaded" src="{{ hero_src }}" srcset="{{ hero_srcset|join(', ') }}" sizes="{{ hero_sizes }}"
+                         width="{{ file.width }}" height="{{ file.height }}" alt="{{ screenshot.title }}" decoding="async"{% if not loop.first %} loading="lazy"{% endif %}>
+                </noscript>
             </figure>
         {% endfor %}
     </div>
@@ -39,7 +57,7 @@
             <a class="home-button home-button--primary" href="{{ path('APP_GALLERY') }}">
                 {{ 'hero.cta_gallery'|trans }} {{ ux_icon('fa7-solid:arrow-right', {'aria-hidden': 'true'}) }}
             </a>
-            <a class="home-button home-button--ghost" href="{{ path('APP_LINKS') }}">{{ 'hero.cta_links'|trans }}</a>
+            <a class="home-button home-button--ghost" href="https://x.com/NaasOff" rel="me noopener" target="_blank">{{ 'hero.cta_links'|trans }}</a>
         </div>
     </div>
 

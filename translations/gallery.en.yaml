@@ -1,11 +1,11 @@
 gallery:
     meta:
-        title: Gallery — Naas
-        description: Browse every Star Citizen and Arc Raiders screenshot by Naas. Filter by game, album, tag, date or colour.
+        title: Star Citizen Screenshot Gallery — Naas
+        description: All my Star Citizen screenshots, plus a few from Arc Raiders. Filter by game, album, tag, date or colour, and download any of them in full resolution.
     hero:
-        eyebrow: Explorer
+        eyebrow: Star Citizen & Arc Raiders screenshots
         title: The gallery
-        lead: Every capture from the 'verse and beyond. Search, filter and dive into the details.
+        lead: Close to 300 screenshots, mostly from the 'verse. Search for a ship or a place (Galaxy, Grim Hex…), or filter by game, tag or colour.
     search:
         label: Search screenshots
         placeholder: Search a ship, a place, a tag…

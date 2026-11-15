@@ -1,0 +1,57 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Doublons probables{% endblock %}
+
+{% block main %}
+    <p class="text-secondary">
+        <strong>Identiques</strong> : même fichier octet pour octet. <strong>Quasi-doublons</strong> : même cadrage et empreinte visuelle très proche
+        (écart ≤ {{ maxDistance }} bits sur 64), par exemple la même image en JPG et en PNG. Un final et son original 32:9 ne sont jamais proposés.
+        La fusion garde le screenshot choisi et lui reporte tags, albums, vues, téléchargements (historique compris) et original.
+    </p>
+    {% if missingHashes > 0 %}
+        <div class="alert alert-warning">{{ missingHashes }} screenshot(s) n’ont pas encore d’empreinte visuelle : lancez <code>bin/console app:screenshots:hash</code>.</div>
+    {% endif %}
+
+    {% for group in groups %}
+        {% set keeper = group.suggestedKeeper %}
+        <form class="duplicate-group" method="post" action="{{ path('APP_ADMIN_duplicates_resolve') }}"
+              data-controller="confirm" data-confirm-message-value="Confirmer ? Les screenshots non conservés seront supprimés définitivement."
+              id="duplicate-group-{{ group.key }}">
+            <input type="hidden" name="_token" value="{{ csrf_token(csrfTokenId) }}">
+            <header class="duplicate-group__header">
+                {% if group.identical %}
+                    <span class="badge badge-danger">Identiques</span>
+                {% else %}
+                    <span class="badge badge-warning">Quasi-doublons · écart {{ group.distance }}</span>
+                {% endif %}
+                <span class="text-secondary">{{ group.screenshots|length }} screenshots</span>
+                <div class="duplicate-group__actions">
+                    <button type="submit" class="btn btn-sm btn-primary" name="operation" value="merge" data-action="confirm#ask"><i class="fa fa-code-merge"></i> Fusionner dans la sélection</button>
+                    <button type="submit" class="btn btn-sm btn-secondary" name="operation" value="dismiss"><i class="fa fa-check"></i> Pas des doublons</button>
+                </div>
+            </header>
+            <div class="duplicate-group__items">
+                {% for screenshot in group.screenshots %}
+                    <input type="hidden" name="screenshots[]" value="{{ screenshot.id }}">
+                    <label class="duplicate-item {{ not screenshot.published ? 'duplicate-item--unpublished' }}">
+                        <input type="radio" name="keep" value="{{ screenshot.id }}" {{ screenshot == keeper ? 'checked' }}>
+                        <img src="{{ screenshot.path|imagine_filter('screenshot_thumbnail') }}" alt="" loading="lazy">
+                        <span class="duplicate-item__title"><a href="{{ path('APP_ADMIN_screenshot_edit', {entityId: screenshot.id}) }}" target="_blank">{{ screenshot.title }}</a></span>
+                        <span class="duplicate-item__meta">
+                            {{ screenshot.file.originalName }}<br>
+                            {{ screenshot.file.dimensions }} · {{ screenshot.file.mimeType|replace({'image/': ''})|upper }} · {{ screenshot.file.size|file_size }}<br>
+                            <i class="fa fa-eye"></i> {{ screenshot.viewCount }} · <i class="fa fa-download"></i> {{ screenshot.downloadCount }}
+                            · {{ screenshot.tags|length }} tag(s) · {{ screenshot.albums|length }} album(s)
+                            {% if screenshot.original %}· <i class="fa fa-panorama" title="Original 32:9 rattaché"></i>{% endif %}
+                            {% if not screenshot.published %}· <i class="fa fa-eye-slash"></i> non publié{% endif %}
+                        </span>
+                        <button type="submit" class="btn btn-sm btn-link text-danger" name="delete" value="{{ screenshot.id }}"
+                                data-action="confirm#ask"><i class="fa fa-trash"></i> Supprimer celui-ci</button>
+                    </label>
+                {% endfor %}
+            </div>
+        </form>
+    {% else %}
+        <div class="alert alert-success">Aucun doublon détecté. <i class="fa fa-champagne-glasses"></i></div>
+    {% endfor %}
+{% endblock %}

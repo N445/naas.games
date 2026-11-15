@@ -1,3 +1,32 @@
+{#
+    SEO contract: a child template may define, at its top level,
+    {% set seo = {
+        indexable: true,            false → robots noindex, no canonical/hreflang
+        canonical_query: {},        query parameters that are part of the canonical URL
+        type: 'website',            og:type ('website' | 'article')
+        page_type: 'WebPage',       schema.org type of the page node
+        image: Screenshot|null,     share image (og_image filter, 1200×630 JPEG)
+        image_alt: '',
+        published: DateTime|null, modified: DateTime|null, tags: [],
+        breadcrumbs: [{name, url}],
+        page: {},                   extra properties of the page node
+        graph: [],                  extra JSON-LD nodes
+    } %}
+#}
+{%- set seo = seo|default({}) -%}
+{%- set locales = ['en', 'fr'] -%}
+{%- set route = app.request.attributes.get('_route') -%}
+{%- set indexable = (seo.indexable ?? true) and route -%}
+{%- if route -%}
+    {%- set route_params = app.request.attributes.get('_route_params', {})|filter((value, key) => key != '_locale')|merge(seo.canonical_query ?? {}) -%}
+    {%- set canonical_url = url(route, route_params) -%}
+{%- else -%}
+    {%- set canonical_url = app.request.uri|split('?')|first -%}
+{%- endif -%}
+{%- set home_url = url('APP_HOMEPAGE', {_locale: 'en'}) -%}
+{%- set person_id = home_url ~ '#naas' -%}
+{%- set website_id = home_url ~ '#website' -%}
+{%- set logo_url = absolute_url(asset('images/naas-logo.png')) -%}
 <!DOCTYPE html>
 <html lang="{{ app.request.locale }}" data-bs-theme="dark">
     <head>
@@ -5,14 +34,113 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Naas{% endblock %}</title>
         <meta name="description" content="{% block meta_description %}{{ 'layout.meta_description'|trans }}{% endblock %}">
-        {% block alternate_links %}{% endblock %}
-        {% block social_meta %}{% endblock %}
-        {% block structured_data %}{% endblock %}
+        <meta name="robots" content="{% block robots %}{{ indexable ? 'index, follow, max-image-preview:large' : 'noindex, follow' }}{% endblock %}">
+        <meta name="author" content="Naas">
+        <meta name="theme-color" content="#07080b">
 
-        <link rel="icon" type="image/png" href="{{ asset('favicon/favicon-96x96.png') }}" sizes="96x96" />
-        <link rel="shortcut icon" href="{{ asset('favicon/favicon.ico') }}" />
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('favicon/apple-touch-icon.png') }}" />
-        <link rel="manifest" href="{{ asset('favicon/site.webmanifest') }}" />
+        {% block alternate_links %}
+            {%~ if indexable %}
+                <link rel="canonical" href="{{ canonical_url }}">
+                {%~ for locale in locales %}
+                    <link rel="alternate" hreflang="{{ locale }}" href="{{ url(route, route_params|merge({_locale: locale})) }}">
+                {%~ endfor %}
+                <link rel="alternate" hreflang="x-default" href="{{ url(route, route_params|merge({_locale: 'en'})) }}">
+            {%~ endif %}
+        {% endblock %}
+
+        {% block social_meta %}
+            {%~ set share_title = block('share_title') is defined ? block('share_title')|trim : block('title')|trim %}
+            {%~ set share_description = block('meta_description')|trim %}
+            {%~ set share_screenshot = seo.image ?? null %}
+            {%~ if share_screenshot %}
+                {%~ set share_image = {
+                    url: share_screenshot.path|imagine_filter('og_image'),
+                    width: 1200, height: 630, type: 'image/jpeg',
+                    alt: seo.image_alt ?? share_screenshot.title,
+                } %}
+            {%~ else %}
+                {%~ set share_image = {url: logo_url, width: 1440, height: 1440, type: 'image/png', alt: 'logo_alt'|trans({}, 'seo')} %}
+            {%~ endif %}
+            <meta property="og:site_name" content="Naas">
+            <meta property="og:type" content="{{ seo.type ?? 'website' }}">
+            <meta property="og:title" content="{{ share_title|raw }}">
+            <meta property="og:description" content="{{ share_description|raw }}">
+            <meta property="og:url" content="{{ canonical_url }}">
+            <meta property="og:locale" content="{{ app.request.locale == 'fr' ? 'fr_FR' : 'en_US' }}">
+            <meta property="og:locale:alternate" content="{{ app.request.locale == 'fr' ? 'en_US' : 'fr_FR' }}">
+            <meta property="og:image" content="{{ share_image.url }}">
+            <meta property="og:image:secure_url" content="{{ share_image.url }}">
+            <meta property="og:image:type" content="{{ share_image.type }}">
+            <meta property="og:image:width" content="{{ share_image.width }}">
+            <meta property="og:image:height" content="{{ share_image.height }}">
+            <meta property="og:image:alt" content="{{ share_image.alt }}">
+            {%~ if (seo.type ?? 'website') == 'article' %}
+                <meta property="article:author" content="{{ home_url }}">
+                {%~ if seo.published ?? null %}<meta property="article:published_time" content="{{ seo.published|date('c') }}">{%~ endif %}
+                {%~ if seo.modified ?? null %}<meta property="article:modified_time" content="{{ seo.modified|date('c') }}">{%~ endif %}
+                {%~ for tag in seo.tags ?? [] %}<meta property="article:tag" content="{{ tag }}">
+                {%~ endfor %}
+            {%~ endif %}
+            <meta name="twitter:card" content="{{ share_screenshot ? 'summary_large_image' : 'summary' }}">
+            <meta name="twitter:site" content="@NaasOff">
+            <meta name="twitter:creator" content="@NaasOff">
+            <meta name="twitter:title" content="{{ share_title|raw }}">
+            <meta name="twitter:description" content="{{ share_description|raw }}">
+            <meta name="twitter:image" content="{{ share_image.url }}">
+            <meta name="twitter:image:alt" content="{{ share_image.alt }}">
+        {% endblock %}
+
+        {% block structured_data %}
+            {%~ set website = {
+                '@type': 'WebSite',
+                '@id': website_id,
+                name: 'Naas',
+                url: home_url,
+                inLanguage: locales,
+                publisher: {'@id': person_id},
+                potentialAction: {
+                    '@type': 'SearchAction',
+                    target: {'@type': 'EntryPoint', urlTemplate: url('APP_GALLERY') ~ '?q={search_term_string}'},
+                    'query-input': 'required name=search_term_string',
+                },
+            } %}
+            {%~ set person = {
+                '@type': 'Person',
+                '@id': person_id,
+                name: 'Naas',
+                url: home_url,
+                image: logo_url,
+                sameAs: seo_same_as(),
+            } %}
+            {%~ set breadcrumbs = seo.breadcrumbs ?? [] %}
+            {%~ set webpage = {
+                '@type': seo.page_type ?? 'WebPage',
+                '@id': canonical_url ~ '#webpage',
+                url: canonical_url,
+                name: block('title')|seo_plain,
+                description: block('meta_description')|seo_plain,
+                inLanguage: app.request.locale,
+                isPartOf: {'@id': website_id},
+                author: {'@id': person_id},
+            }|merge(breadcrumbs is not empty ? {breadcrumb: {'@id': canonical_url ~ '#breadcrumb'}} : {})
+             |merge(seo.page ?? {}) %}
+            {%~ set graph = [website, person, webpage] %}
+            {%~ if breadcrumbs is not empty %}
+                {%~ set items = [] %}
+                {%~ for crumb in breadcrumbs %}
+                    {%~ set items = items|merge([{'@type': 'ListItem', position: loop.index, name: crumb.name}|merge(loop.last ? {} : {item: crumb.url})]) %}
+                {%~ endfor %}
+                {%~ set graph = graph|merge([{'@type': 'BreadcrumbList', '@id': canonical_url ~ '#breadcrumb', itemListElement: items}]) %}
+            {%~ endif %}
+            {%~ set graph = graph|merge(seo.graph ?? []) %}
+            <script type="application/ld+json">{{ {'@context': 'https://schema.org', '@graph': graph}|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP'))|raw }}</script>
+        {% endblock %}
+
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon/favicon.svg') }}">
+        <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('favicon/favicon-96x96.png') }}">
+        <link rel="icon" href="{{ asset('favicon/favicon.ico') }}" sizes="48x48">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('favicon/apple-touch-icon.png') }}">
+        <link rel="manifest" href="{{ asset('favicon/site.webmanifest') }}">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

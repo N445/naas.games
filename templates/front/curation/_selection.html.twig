@@ -1,0 +1,55 @@
+{#- Multi-selection bar of the gallery. Only rendered for ROLE_ADMIN. -#}
+{% trans_default_domain 'curation' %}
+{% set choices = curation_choices() %}
+<div class="curation-bar" role="region" aria-label="{{ 'curation.selection.label'|trans }}" data-curation-selection-target="bar" hidden
+     data-count-zero="{{ 'curation.selection.count_zero'|trans }}" data-count-one="{{ 'curation.selection.count_one'|trans }}"
+     data-count-many="{{ 'curation.selection.count_many'|trans }}"
+     data-working="{{ 'curation.selection.working'|trans }}" data-done="{{ 'curation.selection.done'|trans }}"
+     data-deleted="{{ 'curation.selection.deleted'|trans }}" data-empty="{{ 'curation.selection.empty'|trans }}"
+     data-error="{{ 'curation.selection.error'|trans }}" data-confirm-delete="{{ 'curation.selection.delete_confirm'|trans }}">
+    <div class="curation-bar__summary">
+        <strong data-curation-selection-target="count">{{ 'curation.selection.count_zero'|trans }}</strong>
+        <span class="curation-bar__hint">{{ 'curation.selection.hint'|trans }}</span>
+    </div>
+    <div class="curation-bar__controls">
+        <button type="button" class="gallery-button" data-action="curation-selection#selectAll">{{ 'curation.selection.select_all'|trans }}</button>
+        <button type="button" class="gallery-button" data-action="curation-selection#clear">{{ 'curation.selection.clear'|trans }}</button>
+        <label class="visually-hidden" for="curation-operation">{{ 'curation.selection.operation'|trans }}</label>
+        <select id="curation-operation" class="gallery-field gallery-field--select curation-bar__operation"
+                data-curation-selection-target="operation" data-action="change->curation-selection#showFields">
+            {% for operation in enum('App\\Screenshot\\Curation\\CurationOperation').cases() %}
+                <option value="{{ operation.value }}">{{ ('curation.selection.operations.' ~ operation.value)|trans }}</option>
+            {% endfor %}
+        </select>
+        <div class="curation-bar__field" data-curation-selection-target="field" data-operations="add_tags remove_tags">
+            {{ include('front/curation/_choices.html.twig', {
+                options: choices.tags|map(tag => {value: tag.id ~ '', label: tag.path}),
+                multiple: true, create: true,
+                placeholder: 'curation.selection.tags_placeholder'|trans,
+                label: 'curation.editor.tags'|trans,
+                attributes: 'data-curation-selection-target="tags"',
+            }) }}
+        </div>
+        <div class="curation-bar__field" data-curation-selection-target="field" data-operations="add_album remove_album" hidden>
+            {{ include('front/curation/_choices.html.twig', {
+                options: choices.albums|map(album => {value: album.id ~ '', label: album.title}),
+                create: true,
+                empty_label: '',
+                placeholder: 'curation.selection.album_placeholder'|trans,
+                label: 'curation.editor.albums'|trans,
+                attributes: 'data-curation-selection-target="album"',
+            }) }}
+        </div>
+        <div class="curation-bar__field" data-curation-selection-target="field" data-operations="set_game" hidden>
+            {{ include('front/curation/_choices.html.twig', {
+                options: choices.games|map(game => {value: game.id ~ '', label: game.name}),
+                empty_label: 'curation.editor.no_game'|trans,
+                label: 'curation.editor.game'|trans,
+                attributes: 'data-curation-selection-target="game"',
+            }) }}
+        </div>
+        <button type="button" class="gallery-button gallery-button--primary" data-curation-selection-target="apply" data-action="curation-selection#apply">{{ 'curation.selection.apply'|trans }}</button>
+        <button type="button" class="gallery-button" data-action="curation-selection#toggle">{{ 'curation.selection.exit'|trans }}</button>
+    </div>
+    <p class="curation-status" role="status" data-curation-selection-target="status"></p>
+</div>

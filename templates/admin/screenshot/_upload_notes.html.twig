@@ -1,0 +1,10 @@
+{% if result is defined and result.original %}
+    <span class="upload-row__note"><i class="fa fa-panorama"></i> Original 32:9 en attente rattaché</span>
+{% endif %}
+{% if result is defined and result.lookalikes is not empty %}
+    <span class="upload-row__note upload-row__note--warning">
+        <i class="fa fa-triangle-exclamation"></i> Quasi-doublon probable de
+        {% for other in result.lookalikes|slice(0, 3) %}<a href="{{ path('APP_ADMIN_screenshot_edit', {entityId: other.id}) }}">{{ other.title }}</a>{{ not loop.last ? ', ' }}{% endfor %}
+        · <a href="{{ path('APP_ADMIN_duplicates_index') }}">voir les doublons</a>
+    </span>
+{% endif %}

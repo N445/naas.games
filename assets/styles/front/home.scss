@@ -167,11 +167,31 @@ $home-ink: #0b0b0f;
             opacity: 1;
         }
 
+        // Opaque and covering: once decoded it fully hides the LQIP background. No CSS filter or
+        // persistent transform here, the resting frame is drawn 1:1 from the chosen srcset candidate.
+        // Preview and final are stacked with the same box and framing, so the swap never shifts.
         img {
+            position: absolute;
+            inset: 0;
+            display: block;
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center;
         }
+    }
+
+    &__final {
+        opacity: 0;
+        transition: opacity .35s ease-out;
+
+        &.is-loaded {
+            opacity: 1;
+        }
+    }
+
+    &__preview.is-hidden {
+        visibility: hidden;
     }
 
     &__veil {
@@ -984,6 +1004,7 @@ $home-ink: #0b0b0f;
     }
 
     .home-button,
+    .home-hero__final,
     .home-shot__frame img,
     .home-album__media img {
         transition: none;

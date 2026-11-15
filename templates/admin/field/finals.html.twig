@@ -1,0 +1,5 @@
+{% for final in entity.instance.finals %}
+    <a href="{{ path('APP_ADMIN_screenshot_edit', {entityId: final.id}) }}" class="badge badge-outline rounded-pill">{{ final.title }}</a>
+{% else %}
+    <span class="text-muted" title="Aucun final rattaché">En attente</span>
+{% endfor %}

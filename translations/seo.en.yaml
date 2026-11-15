@@ -1,0 +1,7 @@
+screenshot:
+    description: "%title%: %game% screenshot by Naas, %dimensions% px."
+    description_no_game: "%title%: screenshot by Naas, %dimensions% px."
+album:
+    description: "%title%: screenshot album by Naas."
+logo_alt: Naas logo
+page: Page %page%

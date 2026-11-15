@@ -5,6 +5,9 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     app.screenshots_directory: '%kernel.project_dir%/storage/screenshots'
+    # Set ORIGINAL_DOWNLOADS=0 to hide every "original 32:9" download button on the site.
+    env(ORIGINAL_DOWNLOADS): '1'
+    app.original_downloads: '%env(bool:ORIGINAL_DOWNLOADS)%'
 
 services:
     # default configuration for services in *this* file

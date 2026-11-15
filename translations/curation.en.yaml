@@ -1,0 +1,54 @@
+curation:
+    unpublished: Unpublished
+    original:
+        download: Original 32:9
+        download_hint: 'Download the untouched, uncropped capture (%dimensions%)'
+    choices:
+        create: 'Create “%value%”'
+        no_results: No results
+    editor:
+        title: Editing
+        hint: Only admins see this. Every change is saved right away.
+        published: Published on the site
+        game: Game
+        no_game: No game
+        albums: Albums
+        albums_placeholder: Add to an album…
+        tags: Tags
+        tags_placeholder: Add a tag (or path/to/tag)…
+        admin_link: Open in the admin
+        delete: Delete
+        delete_confirm: 'Permanently delete “%title%”? The file will be erased.'
+        saving: Saving…
+        saved: Saved
+        deleted: Screenshot deleted
+        error: Saving failed, please try again.
+    selection:
+        toggle: Select
+        exit: Done
+        label: Bulk actions
+        hint: 'Click cards to check them · Shift+click for a range · Esc to leave'
+        count_zero: No screenshot selected
+        count_one: 1 screenshot selected
+        count_many: '%count% screenshots selected'
+        select_all: Select all
+        clear: Clear
+        operation: Action
+        operations:
+            add_tags: Add tags
+            remove_tags: Remove tags
+            add_album: Add to an album
+            remove_album: Remove from an album
+            set_game: Set the game
+            publish: Publish
+            unpublish: Unpublish
+            delete: Delete
+        tags_placeholder: Tags…
+        album_placeholder: Pick or create an album…
+        apply: Apply
+        working: Applying…
+        delete_confirm: 'Permanently delete %count% screenshot(s) and their files?'
+        done: '%count% screenshot(s) updated.'
+        deleted: '%count% screenshot(s) deleted.'
+        empty: Select at least one screenshot.
+        error: The action failed, please try again.

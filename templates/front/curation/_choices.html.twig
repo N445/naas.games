@@ -1,0 +1,15 @@
+{#- Shared <select> for the curation UI, enhanced by tom-select (create: typed values are sent as "new:…"). -#}
+{% trans_default_domain 'curation' %}
+<select class="curation-select" data-controller="tom-select"
+        {%- if multiple|default(false) %} multiple{% endif %}
+        {%- if create|default(false) %} data-create="true"{% endif %}
+        data-placeholder="{{ placeholder|default('') }}"
+        data-create-label="{{ 'curation.choices.create'|trans({'%value%': '__value__'}) }}"
+        data-no-results="{{ 'curation.choices.no_results'|trans }}"
+        {%- if label is defined %} aria-label="{{ label }}"{% endif %}
+        {{ attributes|default('')|raw }}>
+    {% if empty_label is defined %}<option value="">{{ empty_label }}</option>{% endif %}
+    {% for option in options %}
+        <option value="{{ option.value }}" {{ option.value in selected|default([]) ? 'selected' }}>{{ option.label }}</option>
+    {% endfor %}
+</select>

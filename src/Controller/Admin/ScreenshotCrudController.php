@@ -9,6 +9,7 @@ use App\Entity\Album;
 use App\Entity\Screenshot;
 use App\Repository\AlbumRepository;
 use App\Repository\ScreenshotRepository;
+use App\Screenshot\Original\OriginalLibrary;
 use App\Screenshot\ScreenshotStorage;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
@@ -31,6 +32,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\DateTimeFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\NullFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\NumericFilter;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -117,6 +119,7 @@ final class ScreenshotCrudController extends AbstractCrudController
             ->add(EntityFilter::new('albums', 'Album'))
             ->add(TagTreeFilter::new())
             ->add(BooleanFilter::new('published', 'Publié'))
+            ->add(NullFilter::new('original', 'Original 32:9')->setChoiceLabels('Sans original', 'Avec original'))
             ->add(DateTimeFilter::new('takenAt', 'Prise le'))
             ->add(DateTimeFilter::new('createdAt', 'Importée le'))
             ->add(NumericFilter::new('viewCount', 'Vues'))
@@ -150,6 +153,22 @@ final class ScreenshotCrudController extends AbstractCrudController
     public function original(Screenshot $screenshot, ScreenshotStorage $storage): BinaryFileResponse
     {
         return $this->file($storage->absolutePath($screenshot), $screenshot->getFile()->getOriginalName(), ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
+    #[AdminRoute('/{entityId}/demote', name: 'demote', options: ['methods' => ['POST']])]
+    public function demote(Request $request, OriginalLibrary $library): Response
+    {
+        $screenshot = $this->screenshots->find($request->attributes->getInt('entityId')) ?? throw $this->createNotFoundException();
+        if (!$this->isCsrfTokenValid('screenshot_demote_'.$screenshot->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+        $title = $screenshot->getTitle();
+        $finals = $library->demote($screenshot);
+        $this->addFlash('success', sprintf('« %s » est désormais un original 32:9%s.', $title, [] === $finals ? ' (en attente de son final)' : sprintf(', rattaché à %d final(s)', count($finals))));
+
+        return [] === $finals
+            ? $this->redirectToRoute('APP_ADMIN_screenshot_original_index')
+            : $this->redirectToRoute('APP_ADMIN_screenshot_edit', ['entityId' => $finals[0]->getId()]);
     }
 
     #[AdminRoute('/add-to-album', name: 'add_to_album', options: ['methods' => ['POST']])]

@@ -15,11 +15,11 @@
                 <div class="lightbox__spinner" aria-hidden="true"></div>
             </div>
             <button type="button" class="lightbox__nav lightbox__nav--previous" data-gallery-lightbox-target="previous" data-action="gallery-lightbox#previous">
-                <span class="fa-solid fa-arrow-left" aria-hidden="true"></span>
+                {{ ux_icon('fa7-solid:arrow-left', {'aria-hidden': 'true'}) }}
                 <span class="visually-hidden">{{ 'gallery.lightbox.previous'|trans }}</span>
             </button>
             <button type="button" class="lightbox__nav lightbox__nav--next" data-gallery-lightbox-target="next" data-action="gallery-lightbox#next">
-                <span class="fa-solid fa-arrow-right" aria-hidden="true"></span>
+                {{ ux_icon('fa7-solid:arrow-right', {'aria-hidden': 'true'}) }}
                 <span class="visually-hidden">{{ 'gallery.lightbox.next'|trans }}</span>
             </button>
         </div>
@@ -31,7 +31,7 @@
             {% endif %}
         </div>
         <button type="button" class="gallery-icon-button lightbox__close" data-action="gallery-lightbox#close" autofocus>
-            <span class="fa-solid fa-xmark" aria-hidden="true"></span>
+            {{ ux_icon('fa7-solid:xmark', {'aria-hidden': 'true'}) }}
             <span class="visually-hidden">{{ 'gallery.lightbox.close'|trans }}</span>
         </button>
         <p class="visually-hidden" id="gallery-lightbox-status" role="status" data-gallery-lightbox-target="status"

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ScreenshotRepository;
+use App\Screenshot\Original\OriginalName;
 use App\Screenshot\Palette;
 use App\Vision\Embedding;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(fields: ['published'])]
 #[ORM\Index(fields: ['takenAt'])]
 #[ORM\Index(columns: ['file_hash'])]
+#[ORM\Index(columns: ['match_key'])]
 class Screenshot
 {
     use TimestampableEntity;
@@ -77,6 +79,24 @@ class Screenshot
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $palette = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $matchKey = null;
+
+    #[ORM\Column(length: 16, nullable: true)]
+    private ?string $perceptualHash = null;
+
+    /**
+     * Screenshots an admin confirmed are not duplicates of this one, despite looking alike.
+     *
+     * @var list<int>|null
+     */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $distinctFrom = null;
+
+    #[ORM\ManyToOne(targetEntity: ScreenshotOriginal::class, inversedBy: 'finals')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    private ?ScreenshotOriginal $original = null;
+
     /**
      * @var Collection<int, Album>
      */
@@ -96,6 +116,7 @@ class Screenshot
     ) {
         $this->albums = new ArrayCollection();
         $this->tags = new ArrayCollection();
+        $this->matchKey = OriginalName::key($file->getOriginalName());
     }
 
     public function getId(): ?int
@@ -267,6 +288,98 @@ class Screenshot
     public function rememberHash(string $hash): void
     {
         $this->file = $this->file->withHash($hash);
+    }
+
+    public function getMatchKey(): string
+    {
+        return $this->matchKey ?? OriginalName::key($this->file->getOriginalName());
+    }
+
+    public function rememberMatchKey(): void
+    {
+        $this->matchKey = OriginalName::key($this->file->getOriginalName());
+    }
+
+    public function getPerceptualHash(): ?string
+    {
+        return $this->perceptualHash;
+    }
+
+    public function rememberPerceptualHash(?string $perceptualHash): void
+    {
+        $this->perceptualHash = $perceptualHash;
+    }
+
+    public function isPanoramic(): bool
+    {
+        return OriginalName::isPanoramic($this->file->getWidth(), $this->file->getHeight());
+    }
+
+    public function getOriginal(): ?ScreenshotOriginal
+    {
+        return $this->original;
+    }
+
+    public function hasOriginal(): bool
+    {
+        return null !== $this->original;
+    }
+
+    public function linkOriginal(ScreenshotOriginal $original): void
+    {
+        if ($this->original === $original) {
+            return;
+        }
+        $this->original?->detachFinal($this);
+        $this->original = $original;
+        $original->attachFinal($this);
+    }
+
+    public function unlinkOriginal(): void
+    {
+        $this->original?->detachFinal($this);
+        $this->original = null;
+    }
+
+    public function isDistinctFrom(self $other): bool
+    {
+        return in_array($other->getId(), $this->distinctFrom ?? [], true) || in_array($this->getId(), $other->distinctFrom ?? [], true);
+    }
+
+    public function markDistinctFrom(self $other): void
+    {
+        $this->distinctFrom = array_values(array_unique([...$this->distinctFrom ?? [], (int) $other->getId()]));
+    }
+
+    /**
+     * Folds a duplicate into this screenshot before it is deleted: classification, audience and
+     * whatever metadata this one lacks are kept, so nothing is lost by keeping the other file.
+     */
+    public function absorb(self $duplicate): void
+    {
+        foreach ($duplicate->getTags() as $tag) {
+            $this->addTag($tag);
+        }
+        foreach ($duplicate->getAlbums()->toArray() as $album) {
+            if ($album->hasCover($duplicate)) {
+                $album->useAsCover($this);
+            }
+            $duplicate->removeAlbum($album);
+            $this->addAlbum($album);
+        }
+        $this->viewCount += $duplicate->viewCount;
+        $this->downloadCount += $duplicate->downloadCount;
+        $this->published = $this->published || $duplicate->published;
+        $this->description ??= $duplicate->description;
+        $this->takenAt ??= $duplicate->takenAt;
+        $this->game ??= $duplicate->game;
+        $this->palette ??= $duplicate->palette;
+        $this->embedding ??= $duplicate->embedding;
+        $this->distinctFrom = array_values(array_unique([...$this->distinctFrom ?? [], ...$duplicate->distinctFrom ?? []])) ?: null;
+        if (null === $this->original && null !== $duplicate->original) {
+            $this->linkOriginal($duplicate->original);
+        }
+        $duplicate->unlinkOriginal();
     }
 
     public function getFile(): StoredImage

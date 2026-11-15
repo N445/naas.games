@@ -1,1 +1,6 @@
-<twig:Admin:ScreenshotQuickEdit screenshot="{{ screenshot }}" id="quick-edit-{{ screenshot.id }}" />
+<div class="upload-card">
+    <twig:Admin:ScreenshotQuickEdit screenshot="{{ screenshot }}" id="quick-edit-{{ screenshot.id }}" />
+    {% if result is defined and (result.original or result.lookalikes is not empty) %}
+        <p class="upload-card__notes">{{ include('admin/screenshot/_upload_notes.html.twig') }}</p>
+    {% endif %}
+</div>

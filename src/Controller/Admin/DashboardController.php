@@ -54,6 +54,8 @@ final class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Screenshots');
         yield MenuItem::linkTo(ScreenshotUploadController::class, 'Importer', 'fa fa-cloud-arrow-up')->setAction('index');
         yield MenuItem::linkTo(ScreenshotCrudController::class, 'Photothèque', 'fa fa-images');
+        yield MenuItem::linkTo(ScreenshotOriginalCrudController::class, 'Originaux 32:9', 'fa fa-panorama');
+        yield MenuItem::linkTo(DuplicateController::class, 'Doublons', 'fa fa-clone')->setAction('index');
         yield MenuItem::linkTo(AlbumCrudController::class, 'Albums', 'fa fa-book-open');
         yield MenuItem::linkTo(TagTreeController::class, 'Tags', 'fa fa-tags')->setAction('index');
         yield MenuItem::linkTo(GameCrudController::class, 'Jeux', 'fa fa-gamepad');

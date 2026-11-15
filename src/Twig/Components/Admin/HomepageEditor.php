@@ -23,18 +23,6 @@ final class HomepageEditor
 
     private const int CANDIDATE_PAGE = 24;
 
-    #[LiveProp(writable: true)]
-    public string $heroTitleEn = '';
-
-    #[LiveProp(writable: true)]
-    public string $heroTitleFr = '';
-
-    #[LiveProp(writable: true)]
-    public string $heroSubtitleEn = '';
-
-    #[LiveProp(writable: true)]
-    public string $heroSubtitleFr = '';
-
     /**
      * @var list<int>
      */
@@ -84,10 +72,6 @@ final class HomepageEditor
     public function load(): void
     {
         $settings = $this->settings->current();
-        $this->heroTitleEn = $settings->getHeroTitles()['en'] ?? '';
-        $this->heroTitleFr = $settings->getHeroTitles()['fr'] ?? '';
-        $this->heroSubtitleEn = $settings->getHeroSubtitles()['en'] ?? '';
-        $this->heroSubtitleFr = $settings->getHeroSubtitles()['fr'] ?? '';
         $this->heroScreenshotIds = $settings->getHeroScreenshotIds();
         $this->featuredAlbumIds = $settings->getFeaturedAlbumIds();
         $this->showStatistics = $settings->isShowStatistics();
@@ -178,16 +162,6 @@ final class HomepageEditor
         return false === $position ? null : $position + 1;
     }
 
-    public function previewTitle(): ?string
-    {
-        return $this->preview(['en' => $this->heroTitleEn, 'fr' => $this->heroTitleFr]);
-    }
-
-    public function previewSubtitle(): ?string
-    {
-        return $this->preview(['en' => $this->heroSubtitleEn, 'fr' => $this->heroSubtitleFr]);
-    }
-
     public function getStoredSettings(): HomepageSettings
     {
         return $this->settings->current();
@@ -274,21 +248,9 @@ final class HomepageEditor
         return array_values(array_filter(array_map(static fn (int $id): ?AlbumHighlight => $albums[$id] ?? null, $this->featuredAlbumIds)));
     }
 
-    /**
-     * @param array<string, string> $values
-     */
-    private function preview(array $values): ?string
-    {
-        $draft = (new HomepageSettings())->setHeroTitles($values);
-
-        return $draft->heroTitle($this->previewLocale);
-    }
-
     private function applyTo(HomepageSettings $settings): void
     {
         $settings
-            ->setHeroTitles(['en' => $this->heroTitleEn, 'fr' => $this->heroTitleFr])
-            ->setHeroSubtitles(['en' => $this->heroSubtitleEn, 'fr' => $this->heroSubtitleFr])
             ->setHeroScreenshotIds($this->heroScreenshotIds)
             ->setFeaturedAlbumIds($this->featuredAlbumIds)
             ->setShowStatistics($this->showStatistics)
@@ -303,8 +265,6 @@ final class HomepageEditor
     private static function fingerprint(HomepageSettings $settings): array
     {
         return [
-            $settings->getHeroTitles(),
-            $settings->getHeroSubtitles(),
             $settings->getHeroScreenshotIds(),
             $settings->getFeaturedAlbumIds(),
             $settings->isShowStatistics(),

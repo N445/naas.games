@@ -6,6 +6,7 @@ use App\Entity\Screenshot;
 use App\Gallery\GalleryFacetQuery;
 use App\Gallery\GalleryFilters;
 use App\Gallery\GalleryQuery;
+use App\Repository\ScreenshotRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +20,7 @@ final class GalleryController extends AbstractController
     public function __construct(
         private readonly GalleryQuery $gallery,
         private readonly GalleryFacetQuery $facets,
+        private readonly ScreenshotRepository $screenshots,
     ) {
     }
 
@@ -74,6 +76,12 @@ final class GalleryController extends AbstractController
 
     private function selected(string $slug): ?Screenshot
     {
-        return '' === $slug ? null : $this->gallery->findPublished($slug);
+        if ('' === $slug) {
+            return null;
+        }
+
+        // Admins keep access to a screenshot they just unpublished from the gallery.
+        return $this->gallery->findPublished($slug)
+            ?? ($this->isGranted('ROLE_ADMIN') ? $this->screenshots->findOneBy(['slug' => $slug]) : null);
     }
 }

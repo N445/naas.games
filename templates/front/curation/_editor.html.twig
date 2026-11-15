@@ -1,0 +1,63 @@
+{#- Inline editing of one screenshot in the lightbox. Only rendered for ROLE_ADMIN. -#}
+{% trans_default_domain 'curation' %}
+{% set choices = curation_choices() %}
+<section class="curation-editor lightbox-detail__section" aria-labelledby="curation-editor-title-{{ screenshot.id }}"
+         data-controller="curation-editor"
+         data-curation-editor-url-value="{{ path('APP_CURATION_UPDATE', {id: screenshot.id}) }}"
+         data-curation-editor-delete-url-value="{{ path('APP_CURATION_DELETE', {id: screenshot.id}) }}"
+         data-curation-editor-token-value="{{ csrf_token(constant('App\\Controller\\CurationController::CSRF_TOKEN_ID')) }}"
+         data-curation-editor-slug-value="{{ screenshot.slug }}"
+         data-curation-editor-confirm-value="{{ 'curation.editor.delete_confirm'|trans({'%title%': screenshot.title}) }}"
+         data-saving="{{ 'curation.editor.saving'|trans }}" data-saved="{{ 'curation.editor.saved'|trans }}"
+         data-error="{{ 'curation.editor.error'|trans }}" data-deleted="{{ 'curation.editor.deleted'|trans }}">
+    <header class="curation-editor__header">
+        <h3 class="lightbox-detail__heading" id="curation-editor-title-{{ screenshot.id }}">{{ 'curation.editor.title'|trans }}</h3>
+        <a class="curation-editor__admin" href="{{ path('APP_ADMIN_screenshot_edit', {entityId: screenshot.id}) }}" target="_blank" rel="noopener">{{ 'curation.editor.admin_link'|trans }}</a>
+    </header>
+    <p class="curation-editor__hint">{{ 'curation.editor.hint'|trans }}</p>
+
+    <label class="curation-switch">
+        <input type="checkbox" data-curation-editor-target="published" data-action="curation-editor#save" {{ screenshot.published ? 'checked' }}>
+        <span>{{ 'curation.editor.published'|trans }}</span>
+    </label>
+
+    <div class="curation-field">
+        <span class="curation-field__label" aria-hidden="true">{{ 'curation.editor.game'|trans }}</span>
+        {{ include('front/curation/_choices.html.twig', {
+            options: choices.games|map(game => {value: game.id ~ '', label: game.name}),
+            selected: [screenshot.game ? screenshot.game.id ~ '' : ''],
+            empty_label: 'curation.editor.no_game'|trans,
+            label: 'curation.editor.game'|trans,
+            attributes: 'data-curation-editor-target="game" data-action="change->curation-editor#save"',
+        }) }}
+    </div>
+
+    <div class="curation-field">
+        <span class="curation-field__label" aria-hidden="true">{{ 'curation.editor.albums'|trans }}</span>
+        {{ include('front/curation/_choices.html.twig', {
+            options: choices.albums|map(album => {value: album.id ~ '', label: album.title ~ (album.published ? '' : ' (' ~ 'curation.unpublished'|trans ~ ')')}),
+            selected: screenshot.albums|map(album => album.id ~ ''),
+            multiple: true, create: true,
+            placeholder: 'curation.editor.albums_placeholder'|trans,
+            label: 'curation.editor.albums'|trans,
+            attributes: 'data-curation-editor-target="albums" data-action="change->curation-editor#save"',
+        }) }}
+    </div>
+
+    <div class="curation-field">
+        <span class="curation-field__label" aria-hidden="true">{{ 'curation.editor.tags'|trans }}</span>
+        {{ include('front/curation/_choices.html.twig', {
+            options: choices.tags|map(tag => {value: tag.id ~ '', label: tag.path}),
+            selected: screenshot.tags|map(tag => tag.id ~ ''),
+            multiple: true, create: true,
+            placeholder: 'curation.editor.tags_placeholder'|trans,
+            label: 'curation.editor.tags'|trans,
+            attributes: 'data-curation-editor-target="tags" data-action="change->curation-editor#save"',
+        }) }}
+    </div>
+
+    <div class="curation-editor__footer">
+        <p class="curation-status" role="status" data-curation-editor-target="status"></p>
+        <button type="button" class="gallery-button curation-danger" data-action="curation-editor#delete">{{ 'curation.editor.delete'|trans }}</button>
+    </div>
+</section>

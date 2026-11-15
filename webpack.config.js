@@ -24,6 +24,8 @@ Encore
     .addEntry('admin', './assets/admin.js')
     .addEntry('home', './assets/home.js')
     .addEntry('gallery', './assets/gallery.js')
+    // Gallery editing tools, only included in pages rendered for a signed-in admin.
+    .addEntry('curation', './assets/curation.js')
     .addEntry('links', './assets/links.js')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.

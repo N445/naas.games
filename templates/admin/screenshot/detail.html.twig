@@ -8,6 +8,7 @@
         </a>
         <div class="screenshot-detail__fields">{{ parent() }}</div>
     </div>
+    <twig:Admin:OriginalPanel screenshot="{{ screenshot }}" id="original-panel-{{ screenshot.id }}" />
     <section class="dashboard-panel">
         <twig:Admin:StatisticsChart screenshot="{{ screenshot }}" />
     </section>

@@ -5,7 +5,7 @@ const COMPACT_THRESHOLD = 20;
 const RETRIES = 1;
 
 export default class extends Controller {
-    static targets = ['dropzone', 'input', 'game', 'album', 'newAlbum', 'summary', 'progress', 'status', 'errors', 'results', 'list', 'done'];
+    static targets = ['dropzone', 'input', 'game', 'album', 'newAlbum', 'mode', 'summary', 'progress', 'status', 'errors', 'results', 'list', 'done'];
     static values = { uploadUrl: String, albumUrl: String, csrfToken: String };
 
     connect() {
@@ -119,6 +119,7 @@ export default class extends Controller {
         body.append('album', albumId);
         body.append('game', this.gameTarget.value);
         body.append('compact', this.compact ? '1' : '0');
+        body.append('mode', this.hasModeTarget ? this.modeTarget.value : 'auto');
 
         return new Promise((resolve, reject) => {
             const request = new XMLHttpRequest();
@@ -153,6 +154,7 @@ export default class extends Controller {
         this.progress = new Map(files.map((file) => [file, 0]));
         this.completed = 0;
         this.duplicates = 0;
+        this.originals = 0;
         this.compact = files.length > COMPACT_THRESHOLD;
         this.finished = false;
         this.errorsTarget.replaceChildren();
@@ -170,7 +172,8 @@ export default class extends Controller {
         this.progress.set(file, 1);
         this.completed += 1;
         this.duplicates += response.duplicate ? 1 : 0;
-        const target = this.compact || response.duplicate ? this.listTarget : this.resultsTarget;
+        this.originals += response.original && !response.duplicate ? 1 : 0;
+        const target = response.compact ?? (this.compact || response.duplicate) ? this.listTarget : this.resultsTarget;
         target.insertAdjacentHTML('afterbegin', response.html);
         this.scheduleRender();
     }
@@ -191,7 +194,8 @@ export default class extends Controller {
         this.render();
         this.doneTarget.hidden = false;
         const duplicates = this.duplicates > 0 ? ` ${this.duplicates} déjà présente(s), ignorée(s).` : '';
-        this.statusTarget.textContent = `${this.completed - this.duplicates} / ${this.progress.size} screenshot(s) importé(s).${duplicates} ${this.compact ? 'Rangez-les depuis la photothèque.' : 'Vous pouvez les renommer, les classer et les taguer ci-dessous.'}`;
+        const originals = this.originals > 0 ? ` ${this.originals} original(aux) 32:9 enregistré(s).` : '';
+        this.statusTarget.textContent = `${this.completed - this.duplicates - this.originals} / ${this.progress.size} screenshot(s) importé(s).${originals}${duplicates} ${this.compact ? 'Rangez-les depuis la photothèque.' : 'Vous pouvez les renommer, les classer et les taguer ci-dessous.'}`;
     }
 
     render() {

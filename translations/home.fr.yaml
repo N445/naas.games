@@ -1,20 +1,20 @@
 meta:
-    title: "Naas — Screenshots du 'verse"
-    description: "Naas capture Star Citizen et Arc Raiders : screenshots cinématiques, albums et voyages à travers le 'verse."
+    title: "Screenshots Star Citizen et Arc Raiders — Naas"
+    description: "Près de 300 screenshots Star Citizen pris en jouant, d’Orison à Pyro, et un peu d’Arc Raiders. À télécharger en pleine résolution, en fond d’écran par exemple."
 hero:
-    eyebrow: Star Citizen · Arc Raiders
-    title: Instants du 'verse
-    subtitle: Des screenshots cinématiques capturés dans Star Citizen et Arc Raiders. Explorez les étoiles, une image à la fois.
-    cta_gallery: Explorer la galerie
-    cta_links: Suivre Naas
+    eyebrow: Par Naas, joueur de Star Citizen
+    title: Mes screenshots Star Citizen
+    subtitle: Près de 300 captures prises en jouant depuis 2022, d’Orison aux zones contestées de Pyro. Et de temps en temps, un peu d’Arc Raiders.
+    cta_gallery: Voir les screenshots
+    cta_links: Me suivre
     scroll: Défiler
-    slides: Screenshots à la une
+    slides: Screenshots mis en avant
     slide: "Afficher le screenshot %number% : %title%"
     pause: Mettre le diaporama en pause
     play: Relancer le diaporama
 statement:
     label: À propos
-    text: "Chaque image est un instant où je me suis arrêté pour regarder : un lever de soleil sur une géante gazeuse, un vaisseau saisi en pleine poussée, un avant-poste silencieux au bout du monde."
+    text: "Je joue à Star Citizen depuis 2022, et mon premier vaisseau était un Avenger Titan. Aujourd’hui je vole plutôt en F7A ou en Ironclad Assault, et je m’arrête de temps en temps pour prendre un screen. Je les retouche un peu, puis je les range ici."
 statistics:
     label: En chiffres
     screenshots: "Screenshot|Screenshots"
@@ -22,17 +22,17 @@ statistics:
     games: "Jeu|Jeux"
     views: "Vue|Vues"
 latest:
-    eyebrow: Tout juste sortis du hangar
-    title: Dernières captures
+    eyebrow: Ajoutés récemment
+    title: Derniers screenshots
     all: Voir tous les screenshots
-    drag: Faites défiler pour explorer
+    drag: Faites défiler pour voir la suite
 albums:
-    eyebrow: Collections
-    title: Albums à la une
+    eyebrow: Albums
+    title: Quelques albums
     count: "{0} Pas encore de screenshot|{1} %count% screenshot|]1,Inf[ %count% screenshots"
     open: "Ouvrir l’album %title%"
-    all: Parcourir tous les albums
+    all: Voir tous les albums
 cta:
-    title: Prêt pour le grand voyage ?
-    text: Des centaines d’images, classées par jeu, album et tag. Téléchargez vos préférées en pleine résolution.
+    title: Envie d’en voir plus ?
+    text: Les quelque 300 captures sont dans la galerie, triées par jeu, album et tag, et toutes téléchargeables en pleine résolution. Les nouvelles passent aussi sur X, sur @NaasOff.
     button: Ouvrir la galerie

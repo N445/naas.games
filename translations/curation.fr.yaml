@@ -1,0 +1,54 @@
+curation:
+    unpublished: Non publié
+    original:
+        download: Original 32:9
+        download_hint: 'Télécharger la capture d’origine, non recadrée (%dimensions%)'
+    choices:
+        create: 'Créer « %value% »'
+        no_results: Aucun résultat
+    editor:
+        title: Édition
+        hint: Visible par les admins uniquement. Chaque modification est enregistrée aussitôt.
+        published: Publié sur le site
+        game: Jeu
+        no_game: Aucun jeu
+        albums: Albums
+        albums_placeholder: Ajouter à un album…
+        tags: Tags
+        tags_placeholder: Ajouter un tag (ou chemin/du/tag)…
+        admin_link: Ouvrir la fiche admin
+        delete: Supprimer
+        delete_confirm: 'Supprimer définitivement « %title% » ? Le fichier sera effacé.'
+        saving: Enregistrement…
+        saved: Enregistré
+        deleted: Screenshot supprimé
+        error: 'Échec de l’enregistrement, réessayez.'
+    selection:
+        toggle: Sélectionner
+        exit: Terminer
+        label: Actions groupées
+        hint: 'Cliquez sur les cartes pour les cocher · Maj+clic pour une plage · Échap pour quitter'
+        count_zero: Aucun screenshot sélectionné
+        count_one: 1 screenshot sélectionné
+        count_many: '%count% screenshots sélectionnés'
+        select_all: Tout sélectionner
+        clear: Vider
+        operation: Action
+        operations:
+            add_tags: Ajouter des tags
+            remove_tags: Retirer des tags
+            add_album: Ajouter à un album
+            remove_album: Retirer d’un album
+            set_game: Définir le jeu
+            publish: Publier
+            unpublish: Dépublier
+            delete: Supprimer
+        tags_placeholder: Tags…
+        album_placeholder: Choisir ou créer un album…
+        apply: Appliquer
+        working: Application en cours…
+        delete_confirm: 'Supprimer définitivement %count% screenshot(s) et leurs fichiers ?'
+        done: '%count% screenshot(s) mis à jour.'
+        deleted: '%count% screenshot(s) supprimé(s).'
+        empty: Sélectionnez au moins un screenshot.
+        error: 'L’action a échoué, réessayez.'

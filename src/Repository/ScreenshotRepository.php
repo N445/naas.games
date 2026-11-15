@@ -38,6 +38,50 @@ class ScreenshotRepository extends ServiceEntityRepository
         return $this->findOneBy(['file.hash' => $hash]);
     }
 
+    /**
+     * @return list<Screenshot>
+     */
+    public function findByMatchKey(string $matchKey): array
+    {
+        return $this->findBy(['matchKey' => $matchKey], ['id' => 'ASC']);
+    }
+
+    /**
+     * @return list<Screenshot>
+     */
+    public function findWithoutOriginal(): array
+    {
+        return $this->findBy(['original' => null], ['id' => 'ASC']);
+    }
+
+    /**
+     * @return list<Screenshot>
+     */
+    public function findSharingHash(): array
+    {
+        $hashes = $this->createQueryBuilder('screenshot')
+            ->select('screenshot.file.hash')
+            ->where('screenshot.file.hash IS NOT NULL')
+            ->groupBy('screenshot.file.hash')
+            ->having('COUNT(screenshot.id) > 1')
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        return [] === $hashes ? [] : $this->findBy(['file.hash' => $hashes], ['id' => 'ASC']);
+    }
+
+    /**
+     * @return list<Screenshot>
+     */
+    public function findPerceptuallyHashed(): array
+    {
+        return $this->createQueryBuilder('screenshot')
+            ->where('screenshot.perceptualHash IS NOT NULL')
+            ->orderBy('screenshot.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findRandomPublished(): ?Screenshot
     {
         $ids = $this->createQueryBuilder('screenshot')
@@ -102,9 +146,6 @@ class ScreenshotRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    /**
-     * @return list<Screenshot>
-     */
     /**
      * @return list<Screenshot>
      */

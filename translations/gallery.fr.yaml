@@ -1,11 +1,11 @@
 gallery:
     meta:
-        title: Galerie — Naas
-        description: Parcourez toutes les captures Star Citizen et Arc Raiders de Naas. Filtrez par jeu, album, tag, date ou couleur.
+        title: Galerie de screenshots Star Citizen — Naas
+        description: Toutes mes captures d’écran Star Citizen, et quelques-unes d’Arc Raiders. Filtrez par jeu, album, tag, date ou couleur, et téléchargez en pleine résolution.
     hero:
-        eyebrow: Explorateur
+        eyebrow: Screenshots Star Citizen et Arc Raiders
         title: La galerie
-        lead: Toutes les captures du 'verse et d'ailleurs. Cherchez, filtrez, plongez dans les détails.
+        lead: Près de 300 screens, surtout du 'verse. Cherchez un vaisseau ou un lieu (Galaxy, Grim Hex…), ou filtrez par jeu, par tag ou par couleur.
     search:
         label: Rechercher des captures
         placeholder: Un vaisseau, un lieu, un tag…

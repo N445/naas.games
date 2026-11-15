@@ -23,18 +23,6 @@ class HomepageSettings
     private ?int $id = null;
 
     /**
-     * @var array<string, string>
-     */
-    #[ORM\Column(type: Types::JSON)]
-    private array $heroTitles = [];
-
-    /**
-     * @var array<string, string>
-     */
-    #[ORM\Column(type: Types::JSON)]
-    private array $heroSubtitles = [];
-
-    /**
      * @var list<int>
      */
     #[ORM\Column(type: Types::JSON)]
@@ -61,52 +49,6 @@ class HomepageSettings
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function heroTitle(string $locale): ?string
-    {
-        return self::translated($this->heroTitles, $locale);
-    }
-
-    public function heroSubtitle(string $locale): ?string
-    {
-        return self::translated($this->heroSubtitles, $locale);
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public function getHeroTitles(): array
-    {
-        return $this->heroTitles;
-    }
-
-    /**
-     * @param array<string, string> $heroTitles
-     */
-    public function setHeroTitles(array $heroTitles): static
-    {
-        $this->heroTitles = self::withoutBlanks($heroTitles);
-
-        return $this;
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public function getHeroSubtitles(): array
-    {
-        return $this->heroSubtitles;
-    }
-
-    /**
-     * @param array<string, string> $heroSubtitles
-     */
-    public function setHeroSubtitles(array $heroSubtitles): static
-    {
-        $this->heroSubtitles = self::withoutBlanks($heroSubtitles);
-
-        return $this;
     }
 
     /**
@@ -191,25 +133,5 @@ class HomepageSettings
         $this->showAlbums = $showAlbums;
 
         return $this;
-    }
-
-
-
-    /**
-     * @param array<string, string> $values
-     */
-    private static function translated(array $values, string $locale): ?string
-    {
-        return $values[$locale] ?? $values[self::DEFAULT_LOCALE] ?? null;
-    }
-
-    /**
-     * @param array<string, string> $values
-     *
-     * @return array<string, string>
-     */
-    private static function withoutBlanks(array $values): array
-    {
-        return array_filter(array_map(trim(...), $values), static fn (string $value): bool => '' !== $value);
     }
 }

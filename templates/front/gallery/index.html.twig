@@ -1,16 +1,110 @@
 {% extends 'front/layout.html.twig' %}
 {% trans_default_domain 'gallery' %}
-{% set canonical_query = selected ? {screenshot: selected.slug} : {} %}
+{#- SEO: a screenshot, an album, a game or a tag (single filter) are landing pages; any other combination is noindex. -#}
+{% set landing_keys = filters.activeKeys|filter(key => key in ['album', 'game', 'tag']) %}
+{% set landing_key = landing_keys|length == 1 and filters.activeKeys|length == 1 ? landing_keys|first : null %}
+{% set landing_label = landing_key ? facets.label(landing_key, filters.value(landing_key)) : null %}
+{% set album = landing_key == 'album' ? seo_album(filters.value('album')) : null %}
+{% set page_suffix = page.number > 1 ? ' · ' ~ 'page'|trans({'%page%': page.number}, 'seo') : '' %}
+{% set person_ref = {'@id': url('APP_HOMEPAGE', {_locale: 'en'}) ~ '#naas'} %}
+{% set gallery_crumbs = [
+    {name: 'layout.nav.home'|trans({}, 'messages'), url: url('APP_HOMEPAGE')},
+    {name: 'layout.nav.gallery'|trans({}, 'messages'), url: url('APP_GALLERY')},
+] %}
+{% set media = [] %}
+{% for screenshot in page|slice(0, 12) %}
+    {% set media = media|merge([{
+        '@type': 'ImageObject',
+        name: screenshot.title,
+        url: url('APP_GALLERY', {screenshot: screenshot.slug}),
+        contentUrl: screenshot.path|imagine_filter('front_hero'),
+        thumbnailUrl: screenshot.path|imagine_filter('front_card'),
+        creator: person_ref,
+        creditText: 'Naas',
+        copyrightNotice: '© Naas',
+        license: url('APP_LICENSE'),
+        acquireLicensePage: url('APP_LICENSE'),
+    }]) %}
+{% endfor %}
+{% if selected %}
+    {% set selected_albums = selected.albums|filter(item => item.published) %}
+    {% set seo = {
+        canonical_query: {screenshot: selected.slug},
+        type: 'article',
+        page_type: 'ItemPage',
+        image: selected,
+        page: {primaryImageOfPage: {'@id': url('APP_GALLERY', {screenshot: selected.slug}) ~ '#primaryimage'}},
+        published: selected.createdAt,
+        modified: selected.updatedAt,
+        tags: selected.tags|map(tag => tag.displayName),
+        breadcrumbs: gallery_crumbs
+            |merge(selected_albums is not empty ? [{name: selected_albums|first.title, url: url('APP_GALLERY', {album: (selected_albums|first).slug})}] : [])
+            |merge([{name: selected.title, url: url('APP_GALLERY', {screenshot: selected.slug})}]),
+        graph: [{
+            '@type': 'ImageObject',
+            '@id': url('APP_GALLERY', {screenshot: selected.slug}) ~ '#primaryimage',
+            name: selected.title,
+            url: url('APP_GALLERY', {screenshot: selected.slug}),
+            contentUrl: selected.path|imagine_filter('front_hero'),
+            thumbnailUrl: selected.path|imagine_filter('front_card'),
+            representativeOfPage: true,
+            creator: person_ref,
+            author: person_ref,
+            creditText: 'Naas',
+            copyrightNotice: '© Naas',
+            license: url('APP_LICENSE'),
+            acquireLicensePage: url('APP_LICENSE'),
+            uploadDate: selected.createdAt|date('c'),
+        }|merge(selected.description ? {caption: selected.description|striptags} : {})
+         |merge(selected.takenAt ? {dateCreated: selected.takenAt|date('c')} : {})
+         |merge(selected.tags is not empty ? {keywords: selected.tags|map(tag => tag.displayName)|join(', ')} : {})],
+    } %}
+{% elseif filters.empty or (landing_key and landing_label and page.total > 0) %}
+    {% set seo = {
+        canonical_query: (landing_key ? {(landing_key): filters.value(landing_key)} : {})|merge(page.number > 1 ? {page: page.number} : {}),
+        page_type: 'ImageGallery',
+        image: album and album.cover and album.cover.published ? album.cover : page|first ?: null,
+        breadcrumbs: landing_key ? gallery_crumbs|merge([{name: landing_label, url: url('APP_GALLERY', {(landing_key): filters.value(landing_key)})}]) : gallery_crumbs,
+        page: {numberOfItems: page.total, associatedMedia: media},
+    } %}
+{% else %}
+    {% set seo = {indexable: false, image: page|first ?: null} %}
+{% endif %}
 
-{% block title %}{{ selected ? selected.title ~ ' — Naas' : 'gallery.meta.title'|trans }}{% endblock %}
-{% block meta_description %}{{ selected and selected.description ? selected.description|striptags|slice(0, 155) : 'gallery.meta.description'|trans }}{% endblock %}
+{% block title -%}
+    {%- if selected -%}
+        {{ selected.title }} — Naas
+    {%- elseif landing_label -%}
+        {{ landing_key == 'album' ? landing_label ~ ' — Naas' : landing_label ~ ' — ' ~ 'layout.nav.gallery'|trans({}, 'messages') ~ ' — Naas' }}{{ page_suffix }}
+    {%- else -%}
+        {{ 'gallery.meta.title'|trans }}{{ page_suffix }}
+    {%- endif -%}
+{%- endblock %}
+{% block meta_description -%}
+    {%- if selected -%}
+        {%- if selected.description -%}
+            {{ selected.description|striptags|slice(0, 155) }}
+        {%- else -%}
+            {{ (selected.game ? 'screenshot.description' : 'screenshot.description_no_game')|trans({'%title%': selected.title, '%game%': selected.game ? selected.game.name : '', '%dimensions%': selected.file.dimensions}, 'seo') }}
+        {%- endif -%}
+    {%- elseif album -%}
+        {{ album.description ? album.description|striptags|slice(0, 155) : 'album.description'|trans({'%title%': album.title}, 'seo') }}
+    {%- else -%}
+        {{ 'gallery.meta.description'|trans }}
+    {%- endif -%}
+{%- endblock %}
 
-{% block stylesheets %}{{ parent() }}{{ encore_entry_link_tags('gallery') }}{% endblock %}
+{% block stylesheets %}{{ parent() }}{{ encore_entry_link_tags('gallery') }}{% if is_granted('ROLE_ADMIN') %}{{ encore_entry_link_tags('curation') }}{% endif %}{% endblock %}
+{% block javascripts %}{{ parent() }}{% if is_granted('ROLE_ADMIN') %}{{ encore_entry_script_tags('curation') }}{% endif %}{% endblock %}
 {% block body_class %}front front--gallery{% endblock %}
 
 {% block main %}
     <div class="gallery" id="gallery"
-         data-controller="gallery-explorer gallery-lightbox"
+         data-controller="gallery-explorer gallery-lightbox{{ is_granted('ROLE_ADMIN') ? ' curation-selection' }}"
+         {%- if is_granted('ROLE_ADMIN') %}
+         data-curation-selection-batch-url-value="{{ path('APP_CURATION_BATCH') }}"
+         data-curation-selection-token-value="{{ csrf_token(constant('App\\Controller\\CurationController::CSRF_TOKEN_ID')) }}"
+         {%- endif %}
          data-gallery-explorer-results-url-value="{{ path('APP_GALLERY_RESULTS') }}"
          data-gallery-explorer-page-url-value="{{ path('APP_GALLERY') }}"
          data-gallery-lightbox-detail-url-value="{{ path('APP_GALLERY_SCREENSHOT', {slug: 'screenshot-slug'}) }}"
@@ -26,7 +120,7 @@
                   data-gallery-explorer-target="form intro"
                   data-action="submit->gallery-explorer#submit">
                 <label class="visually-hidden" for="gallery-search-input">{{ 'gallery.search.label'|trans }}</label>
-                <span class="gallery-search__icon fa-solid fa-magnifying-glass" aria-hidden="true"></span>
+                {{ ux_icon('fa7-solid:magnifying-glass', {class: 'gallery-search__icon', 'aria-hidden': 'true'}) }}
                 <input id="gallery-search-input" class="gallery-search__input" type="search" name="q"
                        value="{{ filters.value('q') }}" maxlength="100" autocomplete="off" enterkeyhint="search"
                        placeholder="{{ 'gallery.search.placeholder'|trans }}"
@@ -47,7 +141,7 @@
                 <div class="gallery-filters__header">
                     <h2 class="gallery-filters__title" id="gallery-filters-title">{{ 'gallery.filters.title'|trans }}</h2>
                     <button type="button" class="gallery-icon-button gallery-filters__close" data-action="gallery-explorer#closeDrawer">
-                        <span class="fa-solid fa-xmark" aria-hidden="true"></span>
+                        {{ ux_icon('fa7-solid:xmark', {'aria-hidden': 'true'}) }}
                         <span class="visually-hidden">{{ 'gallery.filters.close'|trans }}</span>
                     </button>
                 </div>
@@ -75,9 +169,13 @@
                 <div class="gallery-toolbar">
                     <button type="button" class="gallery-button gallery-toolbar__filters" aria-controls="gallery-filters" aria-expanded="false"
                             data-gallery-explorer-target="drawerToggle" data-action="gallery-explorer#openDrawer">
-                        <span class="fa-solid fa-sliders" aria-hidden="true"></span>
+                        {{ ux_icon('fa7-solid:sliders', {'aria-hidden': 'true'}) }}
                         {{ 'gallery.filters.open'|trans }}
                     </button>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <button type="button" class="gallery-button curation-toggle" aria-pressed="false"
+                                data-curation-selection-target="toggle" data-action="curation-selection#toggle">{{ 'curation.selection.toggle'|trans({}, 'curation') }}</button>
+                    {% endif %}
                     <div class="gallery-toolbar__sort">
                         <label for="gallery-sort">{{ 'gallery.sort.label'|trans }}</label>
                         <select id="gallery-sort" name="sort" form="gallery-form" class="gallery-field gallery-field--select"
@@ -96,5 +194,8 @@
         </div>
 
         {{ include('front/gallery/_lightbox.html.twig') }}
+        {% if is_granted('ROLE_ADMIN') %}
+            {{ include('front/curation/_selection.html.twig') }}
+        {% endif %}
     </div>
 {% endblock %}

@@ -24,10 +24,24 @@ export default class extends Controller {
         this.toggleTargets.forEach((toggle) => { toggle.hidden = !this.playing; });
         this.renderToggle();
         this.startTimer();
+        this.finalLoads = new Map();
+        this.saveData = navigator.connection?.saveData === true;
+        // Step 1 (preview) is in the HTML with fetchpriority=high; step 2 (lossless) starts once it is in.
+        const first = this.slideTargets[0];
+        if (first) {
+            this.previewLoaded(first).then(() => this.loadFinal(first)).then(() => this.warmUp());
+        }
     }
 
     disconnect() {
+        this.finalLoads = new Map();
         document.removeEventListener('visibilitychange', this.onVisibilityChange);
+        window.removeEventListener('load', this.onLoad);
+        if (this.idleHandle && 'cancelIdleCallback' in window) {
+            window.cancelIdleCallback(this.idleHandle);
+        } else if (this.idleHandle) {
+            clearTimeout(this.idleHandle);
+        }
         this.timer?.kill();
         gsap.killTweensOf([...this.slideTargets, ...this.element.querySelectorAll('img'), ...this.captionTargets]);
         this.split?.revert();
@@ -76,10 +90,103 @@ export default class extends Controller {
     }
 
     kenBurns(slide) {
-        const image = slide.querySelector('img');
-        const drift = this.index % 2 === 0 ? 2 : -2;
-        // The image must stay scaled by at least twice the drift, otherwise its edge slides into view.
-        gsap.fromTo(image, { scale: 1.16, xPercent: -drift }, { scale: 1.06, xPercent: drift, duration: this.intervalValue / 1000 + 2, ease: 'none', overwrite: 'auto' });
+        const images = slide.querySelectorAll('img');
+        // Settle exactly at scale 1 and drop the transform: the resting frame is rendered 1:1 from the
+        // srcset candidate (no resampling, no compositor layer), so the full resolution stays crisp.
+        gsap.fromTo(images, { scale: 1.05 }, {
+            scale: 1,
+            duration: Math.max(this.intervalValue / 1000 - 1, 2),
+            ease: 'power1.out',
+            overwrite: 'auto',
+            clearProps: 'transform',
+        });
+    }
+
+    previewLoaded(slide) {
+        const preview = slide.querySelector('.home-hero__preview');
+        if (!preview || preview.complete) {
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve) => {
+            preview.addEventListener('load', resolve, { once: true });
+            preview.addEventListener('error', resolve, { once: true });
+        });
+    }
+
+    // Step 2: hand srcset/sizes to the final <img> only now, so the browser picks one lossless
+    // candidate once, then reveal it after decode() so the swap over the preview never flashes.
+    // With Save-Data the preview stays as the final frame.
+    loadFinal(slide) {
+        const final = slide.querySelector('.home-hero__final');
+        if (!final || this.saveData) {
+            return Promise.resolve();
+        }
+        if (this.finalLoads.has(final)) {
+            return this.finalLoads.get(final);
+        }
+
+        final.loading = 'eager';
+        final.sizes = final.dataset.sizes;
+        final.srcset = final.dataset.srcset;
+        const reveal = () => {
+            final.classList.add('is-loaded');
+            const preview = slide.querySelector('.home-hero__preview');
+            setTimeout(() => preview?.classList.add('is-hidden'), 500);
+        };
+        // Some engines reject decode() for very large images although they display fine.
+        const loaded = final.decode().then(reveal, () => {
+            if (final.complete && final.naturalWidth) {
+                reveal();
+            }
+        });
+        this.finalLoads.set(final, loaded);
+
+        return loaded;
+    }
+
+    // Once the page is idle: previews of the following slides first (light), then their lossless
+    // versions one at a time in slide order, so bandwidth goes to the next slide to be shown.
+    warmUp() {
+        const slides = this.slideTargets.slice(1);
+        if (slides.length === 0 || !this.element.isConnected) {
+            return;
+        }
+
+        const run = async () => {
+            slides.forEach((slide) => {
+                const preview = slide.querySelector('.home-hero__preview');
+                if (preview) {
+                    preview.loading = 'eager';
+                    preview.decode?.().catch(() => {});
+                }
+            });
+            for (const slide of slides) {
+                if (!this.element.isConnected) {
+                    return;
+                }
+                await this.loadFinal(slide);
+            }
+        };
+        this.onLoad = () => {
+            this.idleHandle = 'requestIdleCallback' in window ? requestIdleCallback(run, { timeout: 4000 }) : setTimeout(run, 1500);
+        };
+        document.readyState === 'complete' ? this.onLoad() : window.addEventListener('load', this.onLoad, { once: true });
+    }
+
+    // Before a slide is shown: wait for whichever is ready first, its decoded preview or its lossless
+    // version (at most 2.5 s); when only the preview was ready, the lossless one fades in on arrival.
+    ready(slide) {
+        const preview = slide.querySelector('.home-hero__preview');
+        const final = this.loadFinal(slide);
+        const timeout = new Promise((resolve) => { setTimeout(resolve, 2500); });
+        if (!preview?.decode) {
+            return Promise.race([final, timeout]);
+        }
+
+        preview.loading = 'eager';
+
+        return Promise.race([preview.decode().catch(() => {}), final, timeout]);
     }
 
     select({ params: { index } }) {
@@ -101,13 +208,20 @@ export default class extends Controller {
             return;
         }
 
-        const previous = this.slideTargets[this.index];
         const next = this.slideTargets[index];
-        this.index = index;
-        this.renderSlides(previous, next);
-        this.renderCaption(next);
-        this.renderDots();
-        this.startTimer();
+        this.pending = index;
+        this.ready(next).then(() => {
+            if (this.pending !== index || index === this.index || !this.element.isConnected) {
+                return;
+            }
+
+            const previous = this.slideTargets[this.index];
+            this.index = index;
+            this.renderSlides(previous, next);
+            this.renderCaption(next);
+            this.renderDots();
+            this.startTimer();
+        });
     }
 
     renderSlides(previous, next) {
