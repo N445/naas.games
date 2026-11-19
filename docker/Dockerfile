@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM dunglas/frankenphp:1.12-php8.4 AS base
+FROM dunglas/frankenphp:1.13-php8.4 AS base
 WORKDIR /app
 ARG APP_UID=1000
 ARG APP_GID=1000
